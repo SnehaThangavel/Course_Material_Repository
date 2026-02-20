@@ -1,6 +1,6 @@
-const User = require('./server/models/User.cjs');
-const Course = require('./server/models/Course.cjs');
-const connectDB = require('./server/config/db.cjs');
+const User = require('./server/models/User.js');
+const Course = require('./server/models/Course.js');
+const connectDB = require('./server/config/db.js');
 
 module.exports = async (req, res) => {
     try {
