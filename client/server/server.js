@@ -50,8 +50,19 @@ app.get('/api', (req, res) => {
     res.status(200).send('Express API Root');
 });
 
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'ok', message: 'Server is healthy', timestamp: new Date() });
+app.get('/api/health', async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+        res.status(200).json({
+            status: 'ok',
+            db: dbStatus,
+            message: 'Server is healthy',
+            timestamp: new Date()
+        });
+    } catch (err) {
+        res.status(200).json({ status: 'warning', error: err.message, message: 'Server alive but DB check failed' });
+    }
 });
 
 app.get('/api/test', (req, res) => {
