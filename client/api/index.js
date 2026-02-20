@@ -1,15 +1,15 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 const app = require('../server/server');
 const connectDB = require('../server/config/db');
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
     try {
         await connectDB();
         return app(req, res);
     } catch (error) {
-        console.error('Production Serverless Error:', error);
-        res.status(500).json({
-            message: 'Internal Server Error',
-            error: error.message
-        });
+        console.error('ESM Serverless Error:', error);
+        res.status(500).json({ error: error.message });
     }
 };
