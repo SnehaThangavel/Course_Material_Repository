@@ -128,7 +128,11 @@ const AdminProfile = () => {
                     <Card style={{ textAlign: 'center' }}>
                         <div className="profile-avatar-container" style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 20px' }}>
                             {user?.avatar ? (
-                                <img src={user.avatar} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '4px solid white', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }} />
+                                <img
+                                    src={user.avatar.startsWith('http') ? user.avatar : `${user.avatar}`}
+                                    alt="Avatar"
+                                    style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '4px solid white', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}
+                                />
                             ) : (
                                 <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', fontWeight: 'bold' }}>
                                     {user?.name?.charAt(0).toUpperCase()}

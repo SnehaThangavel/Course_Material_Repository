@@ -284,7 +284,7 @@ const EditCourse = () => {
                         <h4 style={{ margin: '0 0 15px' }}>Cover Image</h4>
                         <div style={{
                             width: '100%', height: '150px',
-                            background: course.coverImage ? `url(${course.coverImage}) center/cover` : '#f8fafc',
+                            background: course.coverImage ? `url(${course.coverImage.startsWith('http') ? course.coverImage : `${course.coverImage}`}) center/cover` : '#f8fafc',
                             borderRadius: '12px', border: '2px dashed #e2e8f0',
                             display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '15px',
                             position: 'relative', overflow: 'hidden'

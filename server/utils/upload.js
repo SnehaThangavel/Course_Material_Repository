@@ -1,15 +1,8 @@
 const multer = require('multer');
 const path = require('path');
 
-// Set storage engine
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/avatars/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
+// Set storage engine to memory for serverless
+const storage = multer.memoryStorage();
 
 // Check file type
 function checkFileType(file, cb) {
@@ -20,14 +13,14 @@ function checkFileType(file, cb) {
     if (mimetype && extname) {
         return cb(null, true);
     } else {
-        cb('Error: Images Only!');
+        cb(new Error('Images Only!'));
     }
 }
 
 // Init upload
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 2000000 }, // 2MB
+    limits: { fileSize: 5000000 }, // increased to 5MB
     fileFilter: (req, file, cb) => {
         checkFileType(file, cb);
     }

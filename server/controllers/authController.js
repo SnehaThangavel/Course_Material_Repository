@@ -208,21 +208,29 @@ const uploadAvatar = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: 'Please upload a file' });
     }
 
+    const { uploadToCloudinary } = require('../utils/cloudinary');
     const user = await User.findById(req.user.id);
+
     if (user) {
-        user.avatar = `/uploads/avatars/${req.file.filename}`;
-        await user.save();
+        try {
+            const avatarUrl = await uploadToCloudinary(req.file.buffer, 'avatars');
+            user.avatar = avatarUrl;
+            await user.save();
 
-        await logActivity({
-            userId: user._id,
-            action: 'UPDATE_PROFILE',
-            entityType: 'PROFILE',
-            entityId: user._id,
-            details: 'Uploaded new avatar',
-            req
-        });
+            await logActivity({
+                userId: user._id,
+                action: 'UPDATE_PROFILE',
+                entityType: 'PROFILE',
+                entityId: user._id,
+                details: 'Uploaded new avatar to production storage',
+                req
+            });
 
-        res.status(200).json({ avatar: user.avatar });
+            res.status(200).json({ avatar: user.avatar });
+        } catch (error) {
+            console.error('Cloudinary upload error:', error);
+            res.status(500).json({ message: 'Failed to upload image' });
+        }
     } else {
         res.status(404).json({ message: 'User not found' });
     }

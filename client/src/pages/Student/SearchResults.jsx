@@ -126,7 +126,7 @@ const SearchResults = () => {
                                         <Card className="clickable course-card" style={{ height: '100%', padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                                             <div style={{
                                                 height: '160px',
-                                                background: course.coverImage ? `url(${course.coverImage}) center/cover` : '#f1f5f9',
+                                                background: course.coverImage ? `url(${course.coverImage.startsWith('http') ? course.coverImage : `${course.coverImage}`}) center/cover` : '#f1f5f9',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',

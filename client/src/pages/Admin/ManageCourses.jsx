@@ -230,7 +230,7 @@ const ManageCourses = () => {
                                 <div style={{
                                     width: '180px', height: '120px',
                                     background: course.coverImage
-                                        ? `url(${course.coverImage}) center/cover`
+                                        ? `url(${course.coverImage.startsWith('http') ? course.coverImage : `${course.coverImage}`}) center/cover`
                                         : '#f1f5f9',
                                     borderRight: '1px solid #e2e8f0'
                                 }}>

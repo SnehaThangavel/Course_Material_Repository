@@ -93,8 +93,16 @@ const Layout = () => {
                     </h3>
                     <div className="user-profile">
                         <span>Welcome, <strong>{user?.name}</strong></span>
-                        <div className="avatar">
-                            {user?.name?.charAt(0).toUpperCase()}
+                        <div className="avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {user?.avatar ? (
+                                <img
+                                    src={user.avatar.startsWith('http') ? user.avatar : `${user.avatar}`}
+                                    alt="Profile"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                            ) : (
+                                user?.name?.charAt(0).toUpperCase()
+                            )}
                         </div>
                     </div>
                 </header>

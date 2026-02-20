@@ -362,15 +362,31 @@ const uploadCourseCover = async (req, res) => {
         return res.status(400).json({ message: 'Please upload an image' });
     }
 
+    const { uploadToCloudinary } = require('../utils/cloudinary');
     const course = await Course.findById(req.params.id);
     if (!course) {
         return res.status(404).json({ message: 'Course not found' });
     }
 
-    course.coverImage = `/uploads/${req.file.filename}`;
-    await course.save();
+    try {
+        const imageUrl = await uploadToCloudinary(req.file.buffer, 'course_covers');
+        course.coverImage = imageUrl;
+        await course.save();
 
-    res.status(200).json({ coverImage: course.coverImage });
+        await logActivity({
+            userId: req.user.id,
+            action: 'UPDATE_COURSE',
+            entityType: 'COURSE',
+            entityId: course._id,
+            details: `Course cover updated for: ${course.title}`,
+            req
+        });
+
+        res.status(200).json({ coverImage: course.coverImage });
+    } catch (error) {
+        console.error('Cloudinary upload error:', error);
+        res.status(500).json({ message: 'Failed to upload image' });
+    }
 };
 
 module.exports = {
