@@ -1,6 +1,6 @@
-const User = require('../client/server/models/User');
-const Course = require('../client/server/models/Course');
-const connectDB = require('../client/server/config/db');
+const User = require('../client/server/models/User.cjs');
+const Course = require('../client/server/models/Course.cjs');
+const connectDB = require('../client/server/config/db.cjs');
 
 module.exports = async (req, res) => {
     try {
@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
             });
         }
 
-        // Clear existing data (optional, but good for clean seed)
+        // Clear existing data
         await User.deleteMany();
         await Course.deleteMany();
 
