@@ -1,0 +1,40 @@
+:root {
+  /* Colors */
+  --primary-color: #1e40af;
+  /* Deep Soft Blue */
+  --secondary-color: #3b82f6;
+  /* Bright Soft Blue */
+  --accent-color: #60a5fa;
+  /* Light Soft Blue */
+  --bg-light: #f0f7ff;
+  /* Airy Blue Background */
+  --text-gray: #64748b;
+  /* Slate Gray */
+  --text-dark: #1e293b;
+  /* Deep Slate Blue */
+  --white: #ffffff;
+  --danger: #ef4444;
+  --success: #10b981;
+
+  /* Fonts */
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* UI Specs */
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --box-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.1);
+  --transition-speed: 200ms ease;
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --header-height: 70px;
+}
