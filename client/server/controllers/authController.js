@@ -263,6 +263,31 @@ const getMyActivity = asyncHandler(async (req, res) => {
     });
 });
 
+// @desc    Emergency seed production DB
+// @route   GET /api/auth/seed-production-emergency
+// @access  Public (Hidden)
+const seedProduction = asyncHandler(async (req, res) => {
+    const Course = require('../models/Course');
+
+    // Clear
+    await User.deleteMany();
+    await Course.deleteMany();
+
+    // Create Admin
+    const admin = await User.create({
+        name: 'Admin User',
+        email: 'admin@crm.com',
+        password: 'Admin@123',
+        role: 'admin',
+    });
+
+    res.status(200).json({
+        success: true,
+        message: 'Production Database Emergency Seeded!',
+        user: admin.email
+    });
+});
+
 module.exports = {
     registerUser,
     loginUser,
@@ -272,4 +297,5 @@ module.exports = {
     changePassword,
     uploadAvatar,
     getMyActivity,
+    seedProduction,
 };
