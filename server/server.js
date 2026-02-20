@@ -46,6 +46,10 @@ app.use('/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/courses', courseRoutes);
 
+app.get('/api', (req, res) => {
+    res.status(200).send('Express API Root');
+});
+
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'ok', message: 'Server is healthy', timestamp: new Date() });
 });
