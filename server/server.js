@@ -50,6 +50,10 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'ok', message: 'Server is healthy', timestamp: new Date() });
 });
 
+app.get('/api/test', (req, res) => {
+    res.status(200).json({ message: 'Express diagnostic route works!', time: new Date() });
+});
+
 // Error handler
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode ? res.statusCode : 500;
