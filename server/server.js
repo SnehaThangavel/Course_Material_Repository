@@ -54,6 +54,14 @@ app.get('/api/test', (req, res) => {
     res.status(200).json({ message: 'Express diagnostic route works!', time: new Date() });
 });
 
+app.all('/api/*', (req, res) => {
+    res.status(200).json({
+        message: 'API Function reached, but no specific route matched.',
+        path: req.path,
+        method: req.method
+    });
+});
+
 // Error handler
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode ? res.statusCode : 500;
