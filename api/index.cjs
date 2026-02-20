@@ -1,5 +1,5 @@
-const app = require('../client/server/server.cjs');
-const connectDB = require('../client/server/config/db.cjs');
+const app = require('./server/server.cjs');
+const connectDB = require('./server/config/db.cjs');
 
 module.exports = async (req, res) => {
     try {
