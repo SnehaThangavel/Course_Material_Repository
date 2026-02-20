@@ -28,7 +28,9 @@ const Signup = () => {
                 navigate('/student/dashboard');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Signup failed. Try again.');
+            const message = err.response?.data?.message || err.message || 'Signup failed. Try again.';
+            setError(message);
+            console.error('Signup Error:', err.response?.data || err);
         } finally {
             setIsLoading(false);
         }
