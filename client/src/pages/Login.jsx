@@ -54,7 +54,7 @@ const Login = () => {
                 </div>
 
                 <div className="auth-welcome">
-                    <h2>Welcome Back</h2>
+                    <h2>Welcome Back <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>v2.0.1</span></h2>
                     <p className="auth-subtitle">Explore your educational resource repository</p>
                 </div>
 
