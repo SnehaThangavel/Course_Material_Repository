@@ -25,7 +25,9 @@ const Login = () => {
                 navigate('/student/dashboard');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+            const message = err.response?.data?.message || err.message || 'Login failed. Please check your credentials.';
+            setError(message);
+            console.error('Login Error:', err.response?.data || err);
         } finally {
             setIsLoading(false);
         }

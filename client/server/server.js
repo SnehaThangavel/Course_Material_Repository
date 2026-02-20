@@ -58,6 +58,21 @@ app.get('/api/test', (req, res) => {
     res.status(200).json({ message: 'Express diagnostic route works!', time: new Date() });
 });
 
+app.get('/api/auth/debug', async (req, res) => {
+    try {
+        const User = require('./models/User');
+        const count = await User.countDocuments();
+        const adminExists = await User.findOne({ email: /admin/i });
+        res.json({
+            userCount: count,
+            adminFound: !!adminExists,
+            adminEmail: adminExists ? adminExists.email : null
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.all('/api/*', (req, res) => {
     res.status(200).json({
         message: 'API Function reached, but no specific route matched.',
