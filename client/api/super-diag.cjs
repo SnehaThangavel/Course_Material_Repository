@@ -1,10 +1,7 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
 const User = require('../server/models/User');
 const connectDB = require('../server/config/db');
 
-export default async (req, res) => {
+module.exports = async (req, res) => {
     try {
         await connectDB();
         const count = await User.countDocuments();
@@ -15,7 +12,7 @@ export default async (req, res) => {
             connection: 'healthy',
             totalUsers: count,
             adminFound: !!admin,
-            message: 'ESM Super-Diagnostic Complete'
+            message: 'CJS Super-Diagnostic Complete'
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
