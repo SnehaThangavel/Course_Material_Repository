@@ -1,5 +1,5 @@
-const User = require('../client/server/models/User.cjs');
-const connectDB = require('../client/server/config/db.cjs');
+const User = require('../server/models/User.cjs');
+const connectDB = require('../server/config/db.cjs');
 
 module.exports = async (req, res) => {
     try {
@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
             connection: 'healthy',
             totalUsers: count,
             adminFound: !!admin,
-            message: 'CJS Super-Diagnostic Complete'
+            message: 'Internalized CJS Super-Diagnostic Complete'
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

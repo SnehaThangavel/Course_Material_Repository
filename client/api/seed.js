@@ -1,6 +1,6 @@
-const User = require('../client/server/models/User.cjs');
-const Course = require('../client/server/models/Course.cjs');
-const connectDB = require('../client/server/config/db.cjs');
+const User = require('../server/models/User.cjs');
+const Course = require('../server/models/Course.cjs');
+const connectDB = require('../server/config/db.cjs');
 
 module.exports = async (req, res) => {
     try {
@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Production Database Seeded Successfully!',
+            message: 'Production Database Seeded Successfully (Internalized)!',
             adminEmail: 'admin@crm.com'
         });
     } catch (error) {
