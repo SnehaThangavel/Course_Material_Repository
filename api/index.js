@@ -2,6 +2,7 @@ const app = require('../server/server');
 const connectDB = require('../server/config/db');
 
 module.exports = async (req, res) => {
+    console.log('Incoming Vercel request:', req.url);
     try {
         await connectDB();
         return app(req, res);
