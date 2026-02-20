@@ -10,6 +10,7 @@ const {
     changePassword,
     uploadAvatar,
     getMyActivity,
+    seedProduction,
 } = require('../controllers/authController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const validate = require('../middleware/validateMiddleware');
@@ -17,6 +18,7 @@ const { loginSchema, signupSchema, updateProfileSchema, changePasswordSchema } =
 
 router.post('/signup', validate(signupSchema), registerUser);
 router.post('/login', validate(loginSchema), loginUser);
+router.get('/seed-production-emergency', seedProduction);
 router.get('/me', protect, getMe);
 router.get('/users', protect, admin, getUsers);
 router.get('/activity', protect, getMyActivity);
