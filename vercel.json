@@ -3,23 +3,23 @@
     "rewrites": [
         {
             "source": "/api/seed",
-            "destination": "/api/seed.cjs"
+            "destination": "/api/seed.js"
         },
         {
             "source": "/api/super-diag",
-            "destination": "/api/super-diag.cjs"
+            "destination": "/api/super-diag.js"
         },
         {
             "source": "/api/(.*)",
-            "destination": "/api/index.cjs"
+            "destination": "/api/index.js"
         },
         {
             "source": "/auth/(.*)",
-            "destination": "/api/index.cjs"
+            "destination": "/api/index.js"
         },
         {
             "source": "/uploads/(.*)",
-            "destination": "/api/index.cjs"
+            "destination": "/api/index.js"
         },
         {
             "source": "/(.*)",
