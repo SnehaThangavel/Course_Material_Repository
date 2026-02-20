@@ -2,6 +2,10 @@
     "version": 2,
     "rewrites": [
         {
+            "source": "/api/seed",
+            "destination": "/api/seed.cjs"
+        },
+        {
             "source": "/api/super-diag",
             "destination": "/api/super-diag.cjs"
         },
