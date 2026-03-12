@@ -90,7 +90,7 @@ const StudentDashboard = () => {
 
                     <div style={{ marginTop: '2.5rem', display: 'flex', gap: '2.5rem', justifyContent: 'center' }}>
                         <Link to="/student/discovery" style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.95rem' }} className="hover:text-primary">Browse All Resources</Link>
-                        <Link to="/student/progress" style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.95rem' }} className="hover:text-primary">Check Analytics</Link>
+                        <Link to="/student/analytics" style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.95rem' }} className="hover:text-primary">Check Analytics</Link>
                     </div>
                 </div>
 
