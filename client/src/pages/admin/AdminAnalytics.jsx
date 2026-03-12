@@ -19,6 +19,7 @@ const AdminAnalytics = () => {
     const [skillData, setSkillData] = useState([]);
     const [levelData, setLevelData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [trendType, setTrendType] = useState('daily');
 
     useEffect(() => {
         const fetchAll = async () => {
@@ -76,14 +77,27 @@ const AdminAnalytics = () => {
                     ))}
                 </div>
 
-                {/* Monthly Enrollment Trend */}
-                {overview?.monthlyData && (
+                {/* Enrollment Trend */}
+                {(overview?.dailyData || overview?.weeklyData) && (
                     <Card style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-                        <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--text-main)' }}>Monthly Enrollment Trend (Last 6 Months)</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                                Enrollment Trend
+                            </h3>
+                            <select
+                                className="input-field"
+                                style={{ width: 'auto', padding: '0.4rem 2rem 0.4rem 1rem', minHeight: 'auto' }}
+                                value={trendType}
+                                onChange={(e) => setTrendType(e.target.value)}
+                            >
+                                <option value="daily">Daily (Last 7 Days)</option>
+                                <option value="weekly">Weekly (Last 4 Weeks)</option>
+                            </select>
+                        </div>
                         <ResponsiveContainer width="100%" height={280}>
-                            <LineChart data={overview.monthlyData}>
+                            <LineChart data={trendType === 'daily' ? overview.dailyData : overview.weeklyData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                                 <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
                                 <Tooltip />
                                 <Line type="monotone" dataKey="enrollments" stroke="#6366f1" strokeWidth={2} dot={{ r: 4 }} name="Enrollments" />

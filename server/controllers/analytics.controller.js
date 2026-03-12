@@ -89,23 +89,41 @@ exports.getOverview = async (req, res) => {
             ? Math.round((completedCount / totalEnrollments) * 100)
             : 0;
 
-        // Monthly enrollment trend (last 6 months)
-        const monthlyData = [];
-        for (let i = 5; i >= 0; i--) {
+        // Daily enrollment trend (last 7 days)
+        const dailyData = [];
+        for (let i = 6; i >= 0; i--) {
             const date = new Date();
-            date.setMonth(date.getMonth() - i);
-            const start = new Date(date.getFullYear(), date.getMonth(), 1);
-            const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+            date.setDate(date.getDate() - i);
+            const start = new Date(date).setHours(0,0,0,0);
+            const end = new Date(date).setHours(23,59,59,999);
             const count = await Enrollment.countDocuments({
                 createdAt: { $gte: start, $lte: end }
             });
-            monthlyData.push({
-                month: start.toLocaleString('default', { month: 'short' }),
+            dailyData.push({
+                name: new Date(date).toLocaleString('default', { weekday: 'short' }),
                 enrollments: count
             });
         }
 
-        res.json({ totalStudents, totalCourses, totalEnrollments, completionRate, monthlyData });
+        // Weekly enrollment trend (last 4 weeks)
+        const weeklyData = [];
+        for (let i = 3; i >= 0; i--) {
+            const end = new Date();
+            end.setDate(end.getDate() - (i * 7));
+            end.setHours(23,59,59,999);
+            const start = new Date(end);
+            start.setDate(start.getDate() - 6);
+            start.setHours(0,0,0,0);
+            const count = await Enrollment.countDocuments({
+                createdAt: { $gte: start, $lte: end }
+            });
+            weeklyData.push({
+                name: `Week ${4-i}`,
+                enrollments: count
+            });
+        }
+
+        res.json({ totalStudents, totalCourses, totalEnrollments, completionRate, dailyData, weeklyData });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching overview', error: error.message });
     }
