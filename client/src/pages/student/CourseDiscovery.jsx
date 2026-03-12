@@ -17,14 +17,16 @@ const CourseDiscovery = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState(initialSearch);
     const [category, setCategory] = useState(initialCategory);
+    const [level, setLevel] = useState('All');
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`/api/courses?search=${searchTerm}&category=${category === 'All' ? '' : category}`)
+        const levelQuery = level === 'All' ? '' : `&level=${level}`;
+        axios.get(`/api/courses?search=${searchTerm}&category=${category === 'All' ? '' : category}${levelQuery}`)
             .then(res => setCourses(res.data))
             .catch(err => console.error(err))
             .finally(() => setLoading(false));
-    }, [searchTerm, category]);
+    }, [searchTerm, category, level]);
 
     return (
         <StudentLayout>
@@ -50,12 +52,23 @@ const CourseDiscovery = () => {
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
                             className="input-field"
-                            style={{ background: 'var(--bg)', border: '1px solid var(--border)', fontWeight: 600 }}
+                            style={{ background: 'var(--bg)', border: '1px solid var(--border)', fontWeight: 600, flex: 1 }}
                         >
                             <option value="All">All Disciplines</option>
                             <option value="Software">Software</option>
                             <option value="Hardware">Hardware</option>
                             <option value="General">General</option>
+                        </select>
+                        <select
+                            value={level}
+                            onChange={(e) => setLevel(e.target.value)}
+                            className="input-field"
+                            style={{ background: 'var(--bg)', border: '1px solid var(--border)', fontWeight: 600, flex: 1 }}
+                        >
+                            <option value="All">All Professional Levels</option>
+                            <option value="Beginner">Beginner (Fundamentals)</option>
+                            <option value="Intermediate">Intermediate (Applied)</option>
+                            <option value="Advanced">Advanced (Mastery)</option>
                         </select>
                     </div>
                 </div>

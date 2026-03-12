@@ -16,13 +16,13 @@ const ManageCourses = () => {
     const queryParams = new URLSearchParams(location.search);
     const initialFilter = queryParams.get('filter') || 'all';
     const [statusFilter, setStatusFilter] = useState(initialFilter);
-    const [levelFilter, setLevelFilter] = useState('All Professional Levels');
+    const [levelFilter, setLevelFilter] = useState('all');
     const [categoryFilter, setCategoryFilter] = useState(queryParams.get('category') || 'All');
 
     const handleReset = () => {
         setSearchTerm('');
         setStatusFilter('all');
-        setLevelFilter('All Professional Levels');
+        setLevelFilter('all');
         setCategoryFilter('All');
     };
 
@@ -44,7 +44,7 @@ const ManageCourses = () => {
         if (statusFilter === 'published') matchesStatus = course.isPublished;
 
         let matchesLevel = true;
-        if (levelFilter !== 'All Professional Levels') {
+        if (levelFilter !== 'all') {
             matchesLevel = course.level === levelFilter;
         }
 
@@ -110,10 +110,10 @@ const ManageCourses = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
                             <label className="input-label">Course Level</label>
                             <select className="input-field" value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}>
-                                <option value="All Professional Levels">All Professional Levels</option>
-                                <option value="Beginner (Fundamentals)">Beginner (Fundamentals)</option>
-                                <option value="Intermediate (Applied)">Intermediate (Applied)</option>
-                                <option value="Advanced (Mastery)">Advanced (Mastery)</option>
+                                <option value="all">All Professional Levels</option>
+                                <option value="Beginner">Beginner (Fundamentals)</option>
+                                <option value="Intermediate">Intermediate (Applied)</option>
+                                <option value="Advanced">Advanced (Mastery)</option>
                             </select>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
