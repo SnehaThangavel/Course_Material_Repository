@@ -16,6 +16,13 @@ const ManageCourses = () => {
     const queryParams = new URLSearchParams(location.search);
     const initialFilter = queryParams.get('filter') || 'all';
     const [statusFilter, setStatusFilter] = useState(initialFilter);
+    const [levelFilter, setLevelFilter] = useState('All Professional Levels');
+
+    const handleReset = () => {
+        setSearchTerm('');
+        setStatusFilter('all');
+        setLevelFilter('All Professional Levels');
+    };
 
     const fetchCourses = () => {
         setLoading(true);
@@ -30,9 +37,16 @@ const ManageCourses = () => {
     }, [searchTerm]);
 
     const filteredCourses = courses.filter(course => {
-        if (statusFilter === 'draft') return !course.isPublished;
-        if (statusFilter === 'published') return course.isPublished;
-        return true;
+        let matchesStatus = true;
+        if (statusFilter === 'draft') matchesStatus = !course.isPublished;
+        if (statusFilter === 'published') matchesStatus = course.isPublished;
+
+        let matchesLevel = true;
+        if (levelFilter !== 'All Professional Levels') {
+            matchesLevel = course.level === levelFilter;
+        }
+
+        return matchesStatus && matchesLevel;
     });
 
     const handleDelete = async (id) => {
@@ -88,15 +102,15 @@ const ManageCourses = () => {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
                             <label className="input-label">Course Level</label>
-                            <select className="input-field">
-                                <option>All Professional Levels</option>
-                                <option>Beginner (Fundamentals)</option>
-                                <option>Intermediate (Applied)</option>
-                                <option>Advanced (Mastery)</option>
+                            <select className="input-field" value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}>
+                                <option value="All Professional Levels">All Professional Levels</option>
+                                <option value="Beginner (Fundamentals)">Beginner (Fundamentals)</option>
+                                <option value="Intermediate (Applied)">Intermediate (Applied)</option>
+                                <option value="Advanced (Mastery)">Advanced (Mastery)</option>
                             </select>
                         </div>
                         <div style={{ paddingTop: '1.5rem' }}>
-                            <button style={{ color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, fontSize: '0.875rem' }}>
+                            <button onClick={handleReset} style={{ color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, fontSize: '0.875rem' }}>
                                 <X size={16} /> Reset
                             </button>
                         </div>
