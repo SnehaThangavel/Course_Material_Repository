@@ -134,6 +134,35 @@ const StudentDashboard = () => {
 
                 </div>
 
+                {/* Skill Explorer Section */}
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                        <div style={{ width: '8px', height: '28px', background: 'var(--primary)', borderRadius: '4px' }}></div>
+                        <h2 className="section-title" style={{ margin: 0 }}>Skill Explorer</h2>
+                    </div>
+                    <div className="grid-3" style={{ gap: '1.5rem' }}>
+                        {[
+                            { name: 'Software', icon: <Zap size={24} />, desc: 'Programming, Web & AI', color: '#6366f1' },
+                            { name: 'Hardware', icon: <Layers size={24} />, desc: 'Electronics & Infrastructure', color: '#8b5cf6' },
+                            { name: 'General', icon: <BookA size={24} />, desc: 'Professional Development', color: '#06b6d4' }
+                        ].map((cat) => (
+                            <Link key={cat.name} to={`/student/discovery?category=${cat.name}`} style={{ textDecoration: 'none' }}>
+                                <Card style={{ padding: '2rem', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', border: '1px solid var(--border)' }} className="hover:translate-y-[-6px] hover:border-primary-light hover:shadow-lg">
+                                    <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                                        <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: `${cat.color}15`, color: cat.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            {cat.icon}
+                                        </div>
+                                        <div>
+                                            <h4 style={{ margin: '0 0 0.25rem 0', fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)' }}>{cat.name}</h4>
+                                            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>{cat.desc}</p>
+                                        </div>
+                                    </div>
+                                </Card>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+
                 {/* All Courses Repository Section */}
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>

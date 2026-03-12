@@ -27,7 +27,7 @@ const courseSchema = new mongoose.Schema({
     title: { type: String, required: true },
     courseCode: { type: String, required: true, unique: true },
     category: { type: String, default: 'Uncategorized' },
-    skillCategory: { type: String, enum: ['Software', 'Hardware', 'General Skills', 'Uncategorized'], default: 'Uncategorized' },
+    skillCategory: { type: String, enum: ['Software', 'Hardware', 'General', 'Uncategorized'], default: 'Uncategorized' },
     level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced', 'All Levels'], default: 'All Levels' },
     description: { type: String },
     coverImage: { type: String, default: '' },

@@ -17,11 +17,13 @@ const ManageCourses = () => {
     const initialFilter = queryParams.get('filter') || 'all';
     const [statusFilter, setStatusFilter] = useState(initialFilter);
     const [levelFilter, setLevelFilter] = useState('All Professional Levels');
+    const [categoryFilter, setCategoryFilter] = useState(queryParams.get('category') || 'All');
 
     const handleReset = () => {
         setSearchTerm('');
         setStatusFilter('all');
         setLevelFilter('All Professional Levels');
+        setCategoryFilter('All');
     };
 
     const fetchCourses = () => {
@@ -46,7 +48,12 @@ const ManageCourses = () => {
             matchesLevel = course.level === levelFilter;
         }
 
-        return matchesStatus && matchesLevel;
+        let matchesCategory = true;
+        if (categoryFilter !== 'All') {
+            matchesCategory = course.category === categoryFilter;
+        }
+
+        return matchesStatus && matchesLevel && matchesCategory;
     });
 
     const handleDelete = async (id) => {
@@ -107,6 +114,15 @@ const ManageCourses = () => {
                                 <option value="Beginner (Fundamentals)">Beginner (Fundamentals)</option>
                                 <option value="Intermediate (Applied)">Intermediate (Applied)</option>
                                 <option value="Advanced (Mastery)">Advanced (Mastery)</option>
+                            </select>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
+                            <label className="input-label">Skill Category</label>
+                            <select className="input-field" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+                                <option value="All">All Categories</option>
+                                <option value="Software">Software</option>
+                                <option value="Hardware">Hardware</option>
+                                <option value="General">General</option>
                             </select>
                         </div>
                         <div style={{ paddingTop: '1.5rem' }}>

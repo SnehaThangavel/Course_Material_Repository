@@ -11,11 +11,12 @@ const CourseDiscovery = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const initialSearch = queryParams.get('search') || '';
+    const initialCategory = queryParams.get('category') || 'All';
 
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState(initialSearch);
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState(initialCategory);
 
     useEffect(() => {
         setLoading(true);
@@ -52,10 +53,9 @@ const CourseDiscovery = () => {
                             style={{ background: 'var(--bg)', border: '1px solid var(--border)', fontWeight: 600 }}
                         >
                             <option value="All">All Disciplines</option>
-                            <option value="Programming">Programming</option>
-                            <option value="Design">Design</option>
-                            <option value="Business">Business</option>
-                            <option value="Uncategorized">Other</option>
+                            <option value="Software">Software</option>
+                            <option value="Hardware">Hardware</option>
+                            <option value="General">General</option>
                         </select>
                     </div>
                 </div>

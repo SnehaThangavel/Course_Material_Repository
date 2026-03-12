@@ -116,6 +116,39 @@ const Dashboard = () => {
                     </div>
                 </div>
 
+                {/* Curriculum Categories Section */}
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', padding: '0 0.5rem' }}>
+                        <div style={{ width: '8px', height: '28px', background: 'var(--accent)', borderRadius: '4px' }}></div>
+                        <h3 className="section-title" style={{ margin: 0 }}>Curriculum Analytics by Skill</h3>
+                    </div>
+
+                    <div className="grid-3" style={{ gap: '1.5rem' }}>
+                        {[
+                            { name: 'Software', icon: <PlusCircle size={24} />, color: '#6366f1', count: 'Standard' },
+                            { name: 'Hardware', icon: <Layers size={24} />, color: '#8b5cf6', count: 'Technical' },
+                            { name: 'General', icon: <FileText size={24} />, color: '#06b6d4', count: 'Foundation' }
+                        ].map((cat) => (
+                            <Link key={cat.name} to={`/admin/courses?category=${cat.name}`} style={{ textDecoration: 'none' }}>
+                                <Card style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', transition: 'all 0.3s' }} className="hover:border-primary-light">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ padding: '0.6rem', borderRadius: '12px', background: `${cat.color}15`, color: cat.color }}>
+                                            {cat.icon}
+                                        </div>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-light)', background: 'var(--bg)', padding: '0.25rem 0.6rem', borderRadius: '6px' }}>
+                                            {cat.count}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 style={{ margin: '0 0 0.2rem 0', fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)' }}>{cat.name}</h4>
+                                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Explore modules tagged under {cat.name}.</p>
+                                    </div>
+                                </Card>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+
                 <div style={{ background: 'white', borderRadius: '32px', border: '1px solid var(--border)', padding: '2.5rem', boxShadow: 'var(--shadow-sm)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem' }}>
                         <h3 className="section-title" style={{ marginBottom: 0 }}>High-Performance Curriculum</h3>

@@ -8,7 +8,7 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { ChevronLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, BookOpen, Link as LinkIcon } from 'lucide-react';
 
-const SKILL_CATS = ['Software', 'Hardware', 'General Skills', 'Uncategorized'];
+const SKILL_CATS = ['Software', 'Hardware', 'General'];
 
 const AddCourse = () => {
     const { id } = useParams();
@@ -16,7 +16,7 @@ const AddCourse = () => {
     const isEditing = !!id;
 
     const [course, setCourse] = useState({
-        title: '', courseCode: '', category: 'Programming',
+        title: '', courseCode: '', category: 'Software',
         skillCategory: 'Software', level: 'Beginner',
         description: '', coverImage: '',
         isPublished: false, levels: [],
