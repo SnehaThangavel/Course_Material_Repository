@@ -10,7 +10,8 @@ const {
     getStudentsList,
     getPublishedCoursesList,
     getCourseEnrollmentCounts,
-    getCourseCompletionCounts
+    getCourseCompletionCounts,
+    getDetailedAnalytics
 } = require('../controllers/analytics.controller');
 const { protect, admin } = require('../middleware/auth.middleware');
 
@@ -23,6 +24,7 @@ router.get('/students-list', protect, admin, getStudentsList);
 router.get('/published-courses', protect, admin, getPublishedCoursesList);
 router.get('/enrollment-details', protect, admin, getCourseEnrollmentCounts);
 router.get('/completed-details', protect, admin, getCourseCompletionCounts);
+router.get('/detailed', protect, admin, getDetailedAnalytics);
 
 router.get('/student-overview', protect, getStudentOverview);
 

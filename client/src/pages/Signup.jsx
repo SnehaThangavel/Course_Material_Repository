@@ -73,16 +73,15 @@ const Signup = () => {
     return (
         <div style={{
             minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'var(--bg)', padding: '1rem',
-            backgroundImage: 'radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%)',
-            backgroundAttachment: 'fixed', overflowY: 'auto'
+            background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', padding: '1rem',
+            overflowY: 'auto'
         }}>
             <Card style={{
                 maxWidth: '460px', width: '100%', padding: '1.25rem 2rem',
                 borderRadius: '22px', textAlign: 'center',
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)',
-                boxShadow: '0 30px 80px -20px rgba(0,0,0,0.25)',
+                border: '1px solid rgba(0,0,0,0.05)',
+                background: '#ffffff',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
                 margin: '1rem 0'
             }}>
                 {/* Logo */}

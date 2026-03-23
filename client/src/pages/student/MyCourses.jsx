@@ -64,7 +64,8 @@ const MyCourses = () => {
         if (enrollment.levelNumber && enrollment.levelNumber > 0) {
             return `${base} – Level ${enrollment.levelNumber}`;
         }
-        return base;
+        // If levelNumber is 0, it's the main course, also labeled as Level 1
+        return `${base} – Level 1`;
     };
 
     const getContinueLearningLink = (enrollment) => {
@@ -89,9 +90,13 @@ const MyCourses = () => {
                             {enrollment.courseId?.skillCategory && (
                                 <span className="badge badge-primary">{enrollment.courseId.skillCategory}</span>
                             )}
-                            {enrollment.levelNumber > 0 && (
+                            {enrollment.levelNumber > 0 ? (
                                 <span className="badge" style={{ background: 'var(--surface-muted)', color: 'var(--text-main)' }}>
                                     Level {enrollment.levelNumber}
+                                </span>
+                            ) : (
+                                <span className="badge" style={{ background: 'var(--primary-light)', color: 'var(--primary)' }}>
+                                    Level 1
                                 </span>
                             )}
                         </div>

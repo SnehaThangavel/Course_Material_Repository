@@ -388,3 +388,121 @@ exports.getCourseCompletionCounts = async (req, res) => {
     }
 };
 
+// GET /api/analytics/detailed - Detailed filtering for students/enrollments (admin)
+exports.getDetailedAnalytics = async (req, res) => {
+    try {
+        const { department, year, skillCategory, courseId, level } = req.query;
+        
+        const filter = {};
+        const studentFilter = { role: 'student' };
+
+        // Handle multi-select arrays
+        if (department && department.length) studentFilter.department = { $in: Array.isArray(department) ? department : [department] };
+        if (year && year.length) studentFilter.year = { $in: (Array.isArray(year) ? year : [year]).map(Number) };
+        
+        // Find matching students first
+        const students = await User.find(studentFilter).select('_id name email rollNumber department year').lean();
+        const studentIds = students.map(s => s._id);
+
+        // Build main enrollment filter
+        const enrollmentFilter = { studentId: { $in: studentIds } };
+        
+        if (courseId && courseId.length) enrollmentFilter.courseId = { $in: Array.isArray(courseId) ? courseId : [courseId] };
+        
+        if (level && level.length) {
+            const levels = (Array.isArray(level) ? level : [level]).map(l => {
+                const match = l.match(/\d+/);
+                return match ? parseInt(match[0]) : null;
+            }).filter(l => l !== null);
+            if (levels.length) enrollmentFilter.levelNumber = { $in: levels };
+        }
+
+        // Fetch enrollments with population
+        const enrollments = await Enrollment.find(enrollmentFilter)
+            .populate('studentId', 'name email rollNumber department year')
+            .populate('courseId', 'title skillCategory')
+            .lean();
+
+        let filteredData = enrollments.filter(e => e.studentId && e.courseId);
+        
+        if (skillCategory && skillCategory.length) {
+            const categories = Array.isArray(skillCategory) ? skillCategory : [skillCategory];
+            filteredData = filteredData.filter(e => categories.includes(e.courseId.skillCategory));
+        }
+
+        // Deduplicate: if a student has both Level 0 and Level N (>0) for the same course, remove Level 0
+        const enrollmentMap = new Map();
+        filteredData.forEach(e => {
+            const key = `${e.studentId._id.toString()}_${e.courseId._id.toString()}`;
+            if (!enrollmentMap.has(key)) {
+                enrollmentMap.set(key, []);
+            }
+            enrollmentMap.get(key).push(e);
+        });
+
+        const deduplicatedData = [];
+        enrollmentMap.forEach(courseEnrollments => {
+            const hasLevels = courseEnrollments.some(e => e.levelNumber > 0);
+            if (hasLevels) {
+                // Keep only level > 0 enrollments
+                deduplicatedData.push(...courseEnrollments.filter(e => e.levelNumber > 0));
+            } else {
+                // Keep the level 0 enrollment
+                deduplicatedData.push(...courseEnrollments);
+            }
+        });
+
+        // Map to flat structure for table
+        const tableData = deduplicatedData.map(e => ({
+            _id: e._id,
+            studentName: e.studentId.name,
+            rollNumber: e.studentId.rollNumber,
+            department: e.studentId.department,
+            year: e.studentId.year,
+            courseTitle: e.courseId.title,
+            skillCategory: e.courseId.skillCategory,
+            level: e.levelNumber === 0 ? 'Full Course' : `Level ${e.levelNumber}`,
+            status: e.completed ? 'Completed' : 'In Progress',
+            progress: e.progress || 0,
+            completionDate: e.completionDate
+        }));
+
+        // Advanced Metrics
+        const totalFilteredStudents = new Set(tableData.map(t => t.studentName)).size;
+        const avgCompletion = tableData.length > 0 
+            ? Math.round(tableData.reduce((acc, curr) => acc + curr.progress, 0) / tableData.length)
+            : 0;
+        
+        // Find top performing group (by department)
+        const deptStats = {};
+        tableData.forEach(t => {
+            if (!deptStats[t.department]) deptStats[t.department] = { total: 0, progress: 0 };
+            deptStats[t.department].total++;
+            deptStats[t.department].progress += t.progress;
+        });
+
+        let topGroup = 'N/A';
+        let maxAvg = -1;
+        Object.entries(deptStats).forEach(([dept, stat]) => {
+            const avg = stat.progress / stat.total;
+            if (avg > maxAvg) {
+                maxAvg = avg;
+                topGroup = dept;
+            }
+        });
+
+        res.json({
+            tableData,
+            metrics: {
+                totalStudents: totalFilteredStudents,
+                totalRecords: tableData.length,
+                avgCompletion,
+                topGroup
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching detailed analytics', error: error.message });
+    }
+};
+

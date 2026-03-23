@@ -180,13 +180,16 @@ const AdminPublishedCourses = () => {
                         <div>
                             <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '1rem' }}>Level-wise Student List</h4>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                {sortLevels(selectedCourse.levelBreakdown).map(([lvl, data]) => (
+                                {Object.entries(selectedCourse.levelBreakdown || {}).length > 0 ? (
+                                    sortLevels(selectedCourse.levelBreakdown).map(([lvl, data]) => {
+                                        const displayLvl = lvl === 'Full Course' ? 'Level 1' : lvl;
+                                        return (
                                     <div key={lvl} style={{ display: 'flex', flexDirection: 'column', background: 'var(--surface-muted)', borderRadius: '12px', border: '1px solid var(--border)', overflow: 'hidden' }}>
                                         <div 
                                             onClick={() => setExpandedLevel(expandedLevel === lvl ? null : lvl)}
                                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', cursor: 'pointer', transition: 'background 0.2s' }}
                                         >
-                                            <span style={{ fontWeight: 750, color: 'var(--text-main)' }}>{lvl}</span>
+                                            <span style={{ fontWeight: 750, color: 'var(--text-main)' }}>{displayLvl}</span>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                 <span style={{ fontWeight: 800, color: data.count > 0 ? 'var(--primary)' : 'var(--text-muted)', background: data.count > 0 ? 'var(--primary-light)' : 'var(--surface)', padding: '0.25rem 0.75rem', borderRadius: '8px', fontSize: '0.9rem' }}>{data.count} Students</span>
                                                 <div style={{ transform: expandedLevel === lvl ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>▼</div>
@@ -219,7 +222,10 @@ const AdminPublishedCourses = () => {
                                             </div>
                                         )}
                                     </div>
-                                ))}
+                                ); })
+                            ) : (
+                                <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)', margin: '1rem 0' }}>No level breakdown available.</p>
+                            )}
                             </div>
                         </div>
                     </Card>
