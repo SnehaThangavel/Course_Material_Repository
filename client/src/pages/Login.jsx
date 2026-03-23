@@ -36,7 +36,7 @@ const Login = () => {
             overflowY: 'auto'
         }}>
             <Card style={{
-                maxWidth: '380px',
+                maxWidth: '420px',
                 width: '100%',
                 padding: '2rem 2.25rem',
                 borderRadius: '24px',
