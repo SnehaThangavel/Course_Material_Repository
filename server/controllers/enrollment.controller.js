@@ -16,7 +16,9 @@ exports.enrollInCourse = async (req, res) => {
         if (exists) return res.status(400).json({ message: 'Already enrolled in this level' });
 
         // PREREQUISITE CHECK: Level N requires Level N-1 to be completed
-        if (lvl > 1) {
+        // EXCEPTION: "Aptitude" courses allow random level registration
+        const isAptitude = course.title.toLowerCase().includes('aptitude');
+        if (lvl > 1 && !isAptitude) {
             const prevLevel = await Enrollment.findOne({
                 studentId: req.user.id,
                 courseId,

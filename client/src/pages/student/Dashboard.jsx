@@ -5,7 +5,7 @@ import StudentLayout from '../../layout/StudentLayout';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Loader from '../../components/Loader';
-import { Search, BookA, Bookmark, CheckCircle, Zap } from 'lucide-react';
+import { Search, BookA, Bookmark, CheckCircle, Zap, Layers } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const StudentDashboard = () => {

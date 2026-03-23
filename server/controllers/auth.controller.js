@@ -22,19 +22,36 @@ const userPublicFields = (user) => ({
 });
 
 exports.signup = async (req, res) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, rollNumber, department, year } = req.body;
     try {
+        // Enforce domain restriction
+        if (!email.endsWith('@bitsathy.ac.in')) {
+            return res.status(400).json({ message: 'Only @bitsathy.ac.in email addresses are allowed.' });
+        }
+
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'User already exists' });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Only allow specific email to be admin
+        let assignedRole = 'student';
+        if (email === 'admin@bitsathy.ac.in') {
+            assignedRole = 'admin';
+        } else if (role === 'admin') {
+            return res.status(403).json({ message: 'Unauthorized role assignment.' });
+        }
+
         const user = await User.create({
             name,
             email,
             password: hashedPassword,
-            role: role || 'student',
+            role: assignedRole,
+            rollNumber,
+            department,
+            year,
+            institute: assignedRole === 'student' ? 'Bannari Amman Institute of Technology' : undefined
         });
 
         res.status(201).json({

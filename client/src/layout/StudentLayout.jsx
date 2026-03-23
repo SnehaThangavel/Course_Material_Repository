@@ -1,10 +1,12 @@
-import React, { useContext } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { BookOpen, BookA, Compass, LayoutDashboard, LogOut, TrendingUp, UserCircle, BarChart3 } from 'lucide-react';
+import React, { useContext, useState } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { BookOpen, BookA, Compass, LayoutDashboard, LogOut, TrendingUp, UserCircle, BarChart3, ChevronLeft, ChevronRight, Menu } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import NotificationBell from '../components/NotificationBell';
 
 const StudentLayout = ({ children }) => {
     const { logout, user } = useContext(AuthContext);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -14,12 +16,28 @@ const StudentLayout = ({ children }) => {
 
     return (
         <div className="layout-wrapper">
-            <aside className="sidebar">
-                <div className="sidebar-logo">
-                    <div className="icon-box">
-                        <BookOpen size={24} strokeWidth={2.5} />
+            <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+                <div className="sidebar-header">
+                    <div 
+                        className="sidebar-logo" 
+                        onClick={() => isCollapsed && setIsCollapsed(false)}
+                        title={isCollapsed ? "Expand Sidebar" : ""}
+                        style={{ cursor: isCollapsed ? 'pointer' : 'default' }}
+                    >
+                        <div className="icon-box">
+                            <BookOpen size={22} strokeWidth={2.5} />
+                        </div>
+                        {!isCollapsed && <span>CourseHub</span>}
                     </div>
-                    <span>CourseHub</span>
+                    {!isCollapsed && (
+                        <button 
+                            className="sidebar-toggle-btn"
+                            onClick={() => setIsCollapsed(!isCollapsed)}
+                            title="Collapse Sidebar"
+                        >
+                            <Menu size={20} />
+                        </button>
+                    )}
                 </div>
 
                 <nav className="sidebar-nav">
@@ -46,14 +64,19 @@ const StudentLayout = ({ children }) => {
 
                     <NavLink to="/student/profile" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
                         <UserCircle size={18} />
-                        <span>Settings</span>
+                        <span>My profile</span>
                     </NavLink>
                 </nav>
 
-                <div style={{ marginTop: 'auto', padding: '1rem' }}>
-                    <button onClick={handleLogout} className="nav-item" style={{ width: 'calc(100% - 2rem)', margin: '0' }}>
+                <div className="sidebar-footer" style={{ marginTop: 'auto', padding: '1rem', borderTop: '1px solid var(--border)' }}>
+                    <button 
+                        onClick={handleLogout} 
+                        className="nav-item logout-btn" 
+                        title="Sign Out"
+                        style={{ width: '100%', margin: '0', display: 'flex', justifyContent: isCollapsed ? 'center' : 'flex-start' }}
+                    >
                         <LogOut size={18} />
-                        <span>Sign Out</span>
+                        {!isCollapsed && <span>Sign Out</span>}
                     </button>
                 </div>
             </aside>
@@ -62,10 +85,13 @@ const StudentLayout = ({ children }) => {
                 <header className="header-bar">
                     <div className="header-portal-name">Academic Terminal</div>
                     <div className="header-user-info">
-                        <div className="header-welcome">Active Session: <strong>{user?.name || 'Student'}</strong></div>
-                        <div className="avatar">
-                            {user?.name?.charAt(0) || 'S'}
-                        </div>
+                        <NotificationBell />
+                        <Link to="/student/profile" style={{ display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none', color: 'inherit' }}>
+                            <div className="header-welcome">Active Session: <strong>{user?.name || 'Student'}</strong></div>
+                            <div className="avatar">
+                                {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+                            </div>
+                        </Link>
                     </div>
                 </header>
                 <div className="page-container">

@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
         setUser(data);
     };
 
-    const signup = async (name, email, password, role) => {
-        const { data } = await axios.post('/api/auth/signup', { name, email, password, role });
+    const signup = async (name, email, password, role, rollNumber, department, year) => {
+        const { data } = await axios.post('/api/auth/signup', { name, email, password, role, rollNumber, department, year });
         localStorage.setItem('coursehub_user', JSON.stringify(data));
         setUser(data);
     };

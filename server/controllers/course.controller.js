@@ -1,10 +1,21 @@
 const Course = require('../models/Course');
 const Enrollment = require('../models/Enrollment');
+const Notification = require('../models/Notification');
 
 exports.createCourse = async (req, res) => {
     try {
         const course = new Course({ ...req.body, createdBy: req.user.id });
         await course.save();
+
+        // Trigger Notification
+        await Notification.create({
+            title: 'New Course Added',
+            message: `A new course "${course.title}" is now available.`,
+            type: 'new_course',
+            courseId: course._id,
+            createdBy: req.user.id
+        });
+
         res.status(201).json(course);
     } catch (error) {
         res.status(500).json({ message: 'Error creating course', error: error.message });
@@ -13,19 +24,45 @@ exports.createCourse = async (req, res) => {
 
 exports.getCourses = async (req, res) => {
     try {
-        const filters = {};
+        const queryConditions = [];
+
+        // Role-based filtering
         if (req.user && req.user.role === 'admin') {
             console.log('Admin fetching courses');
         } else {
             console.log('Student fetching courses - filtering for published');
-            filters.isPublished = true;
+            queryConditions.push({ isPublished: true });
         }
 
-        if (req.query.category) filters.category = req.query.category;
-        if (req.query.level) filters.level = req.query.level;
-        if (req.query.search) filters.title = { $regex: req.query.search, $options: 'i' };
+        // Handle category filtering - check both fields for backward compatibility
+        if (req.query.category && req.query.category !== 'All' && req.query.category !== 'all') {
+            queryConditions.push({
+                $or: [
+                    { skillCategory: req.query.category },
+                    { category: req.query.category }
+                ]
+            });
+        }
 
-        console.log('Applying filters:', filters);
+        // Handle level filtering
+        if (req.query.level && req.query.level !== 'All' && req.query.level !== 'all') {
+            queryConditions.push({ level: req.query.level });
+        }
+
+        // Improved search filtering
+        if (req.query.search) {
+            const searchRegex = { $regex: req.query.search, $options: 'i' };
+            queryConditions.push({
+                $or: [
+                    { title: searchRegex },
+                    { courseCode: searchRegex },
+                    { description: searchRegex }
+                ]
+            });
+        }
+
+        const filters = queryConditions.length > 0 ? { $and: queryConditions } : {};
+        console.log('Applying final filters:', JSON.stringify(filters));
 
         const courses = await Course.find(filters)
             .populate('createdBy', 'name')
@@ -62,6 +99,16 @@ exports.updateCourse = async (req, res) => {
     try {
         const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!course) return res.status(404).json({ message: 'Course not found' });
+
+        // Trigger Notification for major updates (e.g., description or title change)
+        await Notification.create({
+            title: 'Course Updated',
+            message: `The course "${course.title}" has been updated with new content.`,
+            type: 'course_update',
+            courseId: course._id,
+            createdBy: req.user.id
+        });
+
         res.json(course);
     } catch (error) {
         res.status(500).json({ message: 'Error updating course', error: error.message });

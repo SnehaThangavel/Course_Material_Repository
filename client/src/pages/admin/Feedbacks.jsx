@@ -19,7 +19,7 @@ const Feedbacks = () => {
     const allReviews = courses.reduce((acc, course) => {
         if (course.reviews) {
             course.reviews.forEach(rev => {
-                acc.push({ ...rev, courseTitle: course.title, courseId: course._id });
+                acc.push({ ...rev, courseTitle: course.title, courseId: course._id, courseCategory: course.category });
             });
         }
         return acc;
@@ -62,7 +62,7 @@ const Feedbacks = () => {
                                             {rev.courseTitle?.charAt(0)}
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Academic Module</div>
+                                            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>{rev.courseCategory}</div>
                                             <h4 style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '1.15rem' }}>{rev.courseTitle}</h4>
                                         </div>
                                     </div>

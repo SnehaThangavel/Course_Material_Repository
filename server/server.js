@@ -10,11 +10,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const path = require('path');
+
 // Routes
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/courses', require('./routes/course.routes'));
-app.use('/api', require('./routes/enrollment.routes')); // /api/enroll, /api/mycourses, etc.
+app.use('/api/notifications', require('./routes/notification.routes'));
+app.use('/api', require('./routes/enrollment.routes'));
 app.use('/api/analytics', require('./routes/analytics.routes'));
+app.use('/api/upload', require('./routes/upload.routes'));
+
+// Static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {

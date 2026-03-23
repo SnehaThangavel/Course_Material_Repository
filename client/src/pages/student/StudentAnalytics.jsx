@@ -8,14 +8,19 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
     AreaChart, Area,
 } from 'recharts';
-import { TrendingUp, CheckCircle, BookOpen, Award } from 'lucide-react';
+import { TrendingUp, CheckCircle, BookOpen, Award, Download, User as UserIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const COLORS = ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
 
 const StudentAnalytics = () => {
+    const { user } = React.useContext(AuthContext);
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -30,6 +35,33 @@ const StudentAnalytics = () => {
         };
         fetchData();
     }, []);
+
+    const generatePDF = async () => {
+        setIsDownloading(true);
+        const reportElement = document.getElementById('analytics-report-content');
+        
+        try {
+            const canvas = await html2canvas(reportElement, {
+                scale: 2, // Higher resolution
+                useCORS: true,
+                logging: false
+            });
+            const imgData = canvas.toDataURL('image/png');
+            
+            // Calculate PDF dimensions based on A4 ratio
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save(`${user?.name?.replace(/\s+/g, '_') || 'student'}_analytics_report.pdf`);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF. Please try again.');
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     // SVG Radial Progress Component (from Progress.jsx)
     const RadialProgress = ({ percentage }) => {
@@ -93,10 +125,69 @@ const StudentAnalytics = () => {
     return (
         <StudentLayout>
             <div style={{ paddingBottom: '3rem' }}>
-                <div style={{ marginBottom: '2.5rem' }}>
-                    <h1 className="page-title">Learning Analytics</h1>
-                    <p className="page-subtitle">Strategic analysis of your academic commitments and objectives.</p>
+                <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                        <h1 className="page-title">Learning Analytics</h1>
+                        <p className="page-subtitle">Strategic analysis of your academic commitments and objectives.</p>
+                    </div>
+                    {!isDownloading && (
+                        <button 
+                            onClick={generatePDF}
+                            disabled={isDownloading}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.75rem',
+                                padding: '0.75rem 1.5rem',
+                                background: 'var(--primary)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '12px',
+                                fontSize: '0.9rem',
+                                fontWeight: 700,
+                                cursor: isDownloading ? 'not-allowed' : 'pointer',
+                                opacity: isDownloading ? 0.7 : 1,
+                                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)',
+                                transition: 'all 0.2s ease'
+                            }}
+                            onMouseOver={(e) => !isDownloading && (e.currentTarget.style.transform = 'translateY(-2px)')}
+                            onMouseOut={(e) => !isDownloading && (e.currentTarget.style.transform = 'translateY(0)')}
+                        >
+                            <Download size={18} />
+                            {isDownloading ? 'Generating...' : 'Download PDF Report'}
+                        </button>
+                    )}
                 </div>
+
+                {/* PDF capture wrapper */}
+                <div id="analytics-report-content" style={{ padding: isDownloading ? '2rem' : '0', background: isDownloading ? 'var(--bg)' : 'transparent', borderRadius: isDownloading ? '16px' : '0' }}>
+                    
+                    {/* Student Profile Header (Only highly styled for the report) */}
+                    <Card style={{ padding: '2rem', marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '2rem', background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface-muted) 100%)', border: '1px solid var(--border)' }}>
+                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 800, flexShrink: 0, boxShadow: '0 8px 16px rgba(99, 102, 241, 0.25)' }}>
+                            {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.5rem 0', letterSpacing: '-0.5px' }}>{user?.name || 'Student Name'}</h2>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '0.75rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>
+                                    <span style={{ padding: '4px 8px', background: 'var(--surface)', borderRadius: '6px', border: '1px solid var(--border)' }}>{user?.rollNumber || 'N/A'}</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>
+                                    <span style={{ padding: '4px 8px', background: 'var(--surface)', borderRadius: '6px', border: '1px solid var(--border)' }}>{user?.department || 'Department Not Set'}</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>
+                                    <span style={{ padding: '4px 8px', background: 'var(--surface)', borderRadius: '6px', border: '1px solid var(--border)' }}>{user?.email || 'email@example.com'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {isDownloading && (
+                             <div style={{ textAlign: 'right' }}>
+                                 <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Report Generated</div>
+                                 <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--primary)', marginTop: '0.25rem' }}>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                             </div>
+                        )}
+                    </Card>
 
                 {/* Stat Cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
@@ -136,9 +227,9 @@ const StudentAnalytics = () => {
                         </div>
                         
                         {/* Right: Detailed Stats */}
-                        <div style={{ flex: '2 1 400px', display: 'flex', flexDirection: 'column', padding: '1.5rem' }}>
+                        <div style={{ flex: '2 1 400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
                             {/* Course Completion Stat */}
-                            <div style={{ flex: 1, padding: '1.5rem', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                            <div style={{ padding: '1.5rem', display: 'flex', gap: '1.5rem', alignItems: 'center', width: '100%', maxWidth: '500px' }}>
                                 <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'linear-gradient(135deg, #e0f2fe, #fff)', color: '#0ea5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.5), 0 4px 6px rgba(0,0,0,0.02)' }}>
                                     <BookOpen size={28} />
                                 </div>
@@ -151,21 +242,7 @@ const StudentAnalytics = () => {
                                 </div>
                             </div>
 
-                            <div style={{ width: 'calc(100% - 3rem)', height: '1px', background: 'var(--border)', margin: '0 auto' }}></div>
 
-                            {/* Skill Areas Stat */}
-                            <div style={{ flex: 1, padding: '1.5rem', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-                                <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'linear-gradient(135deg, #fef3c7, #fff)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.5), 0 4px 6px rgba(0,0,0,0.02)' }}>
-                                    <Award size={28} />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-main)', lineHeight: 1, marginBottom: '0.4rem' }}>{data ? `${data.completedSkillCount || 0}/${data.studentSkillCount || 0}` : '0/0'}</div>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.4rem' }}>Verified Skill Areas</div>
-                                    <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                                        Domain categories you have explored and completed within the repository.
-                                    </p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </Card>
@@ -199,18 +276,64 @@ const StudentAnalytics = () => {
                         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '2rem', color: 'var(--text-main)' }}>Learning Trajectory</h3>
                         {data?.growthData && data.growthData.length > 0 ? (
                             <ResponsiveContainer width="100%" height={280}>
-                                <AreaChart data={data.growthData}>
+                                <AreaChart 
+                                    data={data.growthData} 
+                                    margin={{ top: 20, right: 30, left: 10, bottom: 10 }}
+                                >
                                     <defs>
                                         <linearGradient id="colorLevels" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.5}/>
+                                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
                                             <stop offset="95%" stopColor="var(--primary)" stopOpacity={0.0}/>
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                                    <XAxis dataKey="date" tick={{ fontSize: 11, fontWeight: 600 }} axisLine={false} />
-                                    <YAxis tick={{ fontSize: 11, fontWeight: 600 }} axisLine={false} allowDecimals={false} />
-                                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-lg)' }} />
-                                    <Area type="monotone" dataKey="levels" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorLevels)" />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} opacity={0.5} />
+                                    <XAxis 
+                                        dataKey="date" 
+                                        tick={{ fontSize: 10, fontWeight: 700, fill: 'var(--text-muted)' }} 
+                                        axisLine={false} 
+                                        tickLine={false}
+                                        dy={15}
+                                        padding={{ left: 20, right: 20 }}
+                                    />
+                                    <YAxis 
+                                        tick={{ fontSize: 10, fontWeight: 700, fill: 'var(--text-muted)' }} 
+                                        axisLine={false} 
+                                        tickLine={false}
+                                        allowDecimals={false}
+                                        dx={-10}
+                                        label={{ 
+                                            value: 'LEVELS COMPLETED', 
+                                            angle: -90, 
+                                            position: 'insideLeft', 
+                                            offset: 0, 
+                                            style: { fontSize: '9px', fontWeight: 900, fill: 'var(--text-light)', letterSpacing: '0.1em' } 
+                                        }}
+                                    />
+                                    <Tooltip 
+                                        contentStyle={{ 
+                                            borderRadius: '16px', 
+                                            border: '1px solid var(--border)', 
+                                            boxShadow: 'var(--shadow-lg)',
+                                            padding: '12px 16px',
+                                            background: 'rgba(255, 255, 255, 0.95)',
+                                            backdropFilter: 'blur(4px)'
+                                        }} 
+                                        itemStyle={{ fontWeight: 800, color: 'var(--primary)', fontSize: '14px' }}
+                                        labelStyle={{ fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase' }}
+                                        cursor={{ stroke: 'var(--primary)', strokeWidth: 2, strokeDasharray: '6 6', opacity: 0.3 }}
+                                    />
+                                    <Area 
+                                        type="monotone" 
+                                        dataKey="levels" 
+                                        stroke="var(--primary)" 
+                                        strokeWidth={4} 
+                                        fillOpacity={1} 
+                                        fill="url(#colorLevels)"
+                                        dot={{ r: 5, fill: 'var(--primary)', stroke: '#fff', strokeWidth: 2 }}
+                                        activeDot={{ r: 7, fill: 'var(--primary)', stroke: '#fff', strokeWidth: 2 }}
+                                        animationDuration={1500}
+                                        animationEasing="ease-in-out"
+                                    />
                                 </AreaChart>
                             </ResponsiveContainer>
                         ) : (
@@ -220,6 +343,7 @@ const StudentAnalytics = () => {
                             </div>
                         )}
                     </Card>
+                </div>
                 </div>
             </div>
         </StudentLayout>

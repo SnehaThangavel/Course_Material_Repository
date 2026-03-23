@@ -83,8 +83,8 @@ exports.getOverview = async (req, res) => {
     try {
         const totalStudents = await User.countDocuments({ role: 'student' });
         const totalCourses = await Course.countDocuments({ isPublished: true });
-        const totalEnrollments = await Enrollment.countDocuments();
-        const completedCount = await Enrollment.countDocuments({ completed: true });
+        const totalEnrollments = await Enrollment.countDocuments({ levelNumber: { $ne: 0 } });
+        const completedCount = await Enrollment.countDocuments({ completed: true, levelNumber: { $ne: 0 } });
         const completionRate = totalEnrollments > 0
             ? Math.round((completedCount / totalEnrollments) * 100)
             : 0;
@@ -123,7 +123,7 @@ exports.getOverview = async (req, res) => {
             });
         }
 
-        res.json({ totalStudents, totalCourses, totalEnrollments, completionRate, dailyData, weeklyData });
+        res.json({ totalStudents, totalCourses, totalEnrollments, completedCount, completionRate, dailyData, weeklyData });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching overview', error: error.message });
     }
@@ -196,15 +196,29 @@ exports.getStudentOverview = async (req, res) => {
         });
         const skillData = Object.entries(pieDataMap).map(([name, value]) => ({ name, value }));
 
-        // Level completion over time
+        // Level completion over time - with a starting zero baseline
+        const firstEnrollment = await Enrollment.findOne({ studentId: userId }).sort({ createdAt: 1 });
+        const startDate = firstEnrollment ? firstEnrollment.createdAt : null;
+
         const completedLevels = progress
             .filter(p => p.completed && p.completionDate)
             .sort((a, b) => new Date(a.completionDate) - new Date(b.completionDate));
 
-        const growthData = completedLevels.map((p, idx) => ({
-            date: new Date(p.completionDate).toLocaleDateString(),
-            levels: idx + 1,
-        }));
+        const growthData = [];
+        if (startDate && completedLevels.length > 0) {
+            // Add initial point (0 levels at enrollment date)
+            growthData.push({
+                date: new Date(startDate).toLocaleDateString(),
+                levels: 0,
+            });
+        }
+
+        completedLevels.forEach((p, idx) => {
+            growthData.push({
+                date: new Date(p.completionDate).toLocaleDateString(),
+                levels: idx + 1,
+            });
+        });
 
         // Course completion percentage - use display name for the chart
         const courseProgress = Object.values(groupedMap).map(data => ({
@@ -227,3 +241,150 @@ exports.getStudentOverview = async (req, res) => {
         res.status(500).json({ message: 'Error fetching student overview', error: error.message });
     }
 };
+
+// GET /api/analytics/students-list - List of all students with enrollment stats (admin)
+exports.getStudentsList = async (req, res) => {
+    try {
+        const students = await User.find({ role: 'student' }).select('-password').sort({ createdAt: -1 }).lean();
+        
+        // Enhance students with enrollment and completion counts
+        const enhancedStudents = await Promise.all(students.map(async (student) => {
+            const enrollments = await Enrollment.find({ studentId: student._id });
+            
+            // Count unique courses
+            const enrolledCourseIds = new Set(enrollments.map(e => e.courseId.toString()));
+            const enrolledCount = enrolledCourseIds.size;
+            
+            // Count completed enrollments (levels/courses)
+            const completedCount = enrollments.filter(e => e.completed).length;
+            
+            return {
+                ...student,
+                enrolledCount,
+                completedCount
+            };
+        }));
+
+        res.json(enhancedStudents);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching students list', error: error.message });
+    }
+};
+
+// GET /api/analytics/published-courses - List of published courses (admin) with enrollment stats
+exports.getPublishedCoursesList = async (req, res) => {
+    try {
+        const courses = await Course.find({ isPublished: true }).sort({ createdAt: -1 }).lean();
+        
+        const enhancedCourses = await Promise.all(courses.map(async (course) => {
+            const enrollments = await Enrollment.find({ courseId: course._id }).populate('studentId', 'name email rollNumber department year');
+            const enrollmentCount = enrollments.filter(e => e.levelNumber !== 0).length;
+            const completedCount = enrollments.filter(e => e.completed && e.levelNumber !== 0).length;
+            
+            // Group by level
+            const levelBreakdown = {};
+            enrollments.forEach(e => {
+                const levelKey = e.levelNumber === 0 ? 'Full Course' : `Level ${e.levelNumber}`;
+                if (!levelBreakdown[levelKey]) {
+                    levelBreakdown[levelKey] = { count: 0, students: [] };
+                }
+                levelBreakdown[levelKey].count++;
+                if (e.studentId) {
+                    levelBreakdown[levelKey].students.push(e.studentId);
+                }
+            });
+
+            return {
+                ...course,
+                enrollmentCount,
+                completedCount,
+                levelBreakdown
+            };
+        }));
+
+        res.json(enhancedCourses);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching published courses', error: error.message });
+    }
+};
+
+// GET /api/analytics/enrollment-details - Enrollment counts per course with level breakdown and student lists (admin)
+exports.getCourseEnrollmentCounts = async (req, res) => {
+    try {
+        const enrollments = await Enrollment.find({}).populate('courseId', 'title skillCategory levels').populate('studentId', 'name email rollNumber department year');
+        const courseMap = {};
+        
+        enrollments.forEach(e => {
+            if (e.courseId) {
+                const courseId = e.courseId._id.toString();
+                if (!courseMap[courseId]) {
+                    courseMap[courseId] = {
+                        _id: courseId,
+                        title: e.courseId.title,
+                        category: e.courseId.skillCategory || 'Uncategorized',
+                        enrollmentCount: 0,
+                        levelBreakdown: {}
+                    };
+                }
+                if (e.levelNumber !== 0) {
+                    courseMap[courseId].enrollmentCount++;
+                }
+                
+                const levelKey = e.levelNumber === 0 ? 'Full Course' : `Level ${e.levelNumber}`;
+                if (!courseMap[courseId].levelBreakdown[levelKey]) {
+                    courseMap[courseId].levelBreakdown[levelKey] = { count: 0, students: [] };
+                }
+                courseMap[courseId].levelBreakdown[levelKey].count++;
+                if (e.studentId) {
+                    courseMap[courseId].levelBreakdown[levelKey].students.push(e.studentId);
+                }
+            }
+        });
+        
+        const data = Object.values(courseMap).sort((a, b) => b.enrollmentCount - a.enrollmentCount);
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching course enrollment details', error: error.message });
+    }
+};
+
+// GET /api/analytics/completed-details - Completion counts per course with level breakdown and student lists (admin)
+exports.getCourseCompletionCounts = async (req, res) => {
+    try {
+        const completedEnrollments = await Enrollment.find({ completed: true }).populate('courseId', 'title skillCategory').populate('studentId', 'name email rollNumber department year');
+        const courseMap = {};
+        
+        completedEnrollments.forEach(e => {
+            if (e.courseId) {
+                const courseId = e.courseId._id.toString();
+                if (!courseMap[courseId]) {
+                    courseMap[courseId] = {
+                        _id: courseId,
+                        title: e.courseId.title,
+                        category: e.courseId.skillCategory || 'Uncategorized',
+                        completedCount: 0,
+                        levelBreakdown: {}
+                    };
+                }
+                if (e.levelNumber !== 0) {
+                    courseMap[courseId].completedCount++;
+                }
+                
+                const levelKey = e.levelNumber === 0 ? 'Full Course' : `Level ${e.levelNumber}`;
+                if (!courseMap[courseId].levelBreakdown[levelKey]) {
+                    courseMap[courseId].levelBreakdown[levelKey] = { count: 0, students: [] };
+                }
+                courseMap[courseId].levelBreakdown[levelKey].count++;
+                if (e.studentId) {
+                    courseMap[courseId].levelBreakdown[levelKey].students.push(e.studentId);
+                }
+            }
+        });
+        
+        const data = Object.values(courseMap).sort((a, b) => b.completedCount - a.completedCount);
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching course completion details', error: error.message });
+    }
+};
+

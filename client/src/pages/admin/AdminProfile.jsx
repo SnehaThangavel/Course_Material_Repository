@@ -229,11 +229,6 @@ const AdminProfile = () => {
                                         />
                                     </div>
 
-                                    {/* Profile Image URL */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                                        <label style={labelStyle}>Profile Photo URL</label>
-                                        <Input name="profileImage" value={formData.profileImage} onChange={handleChange} placeholder="https://your-image-link.com/photo.jpg" />
-                                    </div>
                                 </form>
                             </Card>
                         ) : (

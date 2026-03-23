@@ -8,7 +8,13 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { Camera, UserCircle, Shield, Lock, Save, GraduationCap } from 'lucide-react';
 
-const DEPARTMENTS = ['Computer Science', 'Information Technology', 'Electronics', 'Mechanical', 'Civil', 'MBA', 'MCA', 'Other'];
+const DEPARTMENTS = [
+    'Computer Science', 'Information Technology', 'Electronics', 'Mechanical', 'Civil',
+    'Computer Science and Business Systems', 'Electrical and Electronics', 'Electrical Communication',
+    'Food Technology', 'Fashion Technology', 'Information Science',
+    'Artificial Intelligence and Data Science', 'Artificial Intelligence and Machine Learning',
+    'Biotechnology', 'MBA', 'MCA', 'Other'
+];
 const STREAMS = ['BE', 'BTECH', 'MCA', 'MBA', 'Other'];
 const YEARS = ['1', '2', '3', '4'];
 
@@ -141,7 +147,7 @@ const Profile = () => {
                                 <Input label="Full Name" name="name" value={formData.name} onChange={handleChange} placeholder="Your name" required />
                                 <Input label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} placeholder="+91 98765 43210" />
                                 <Input label="Roll Number" name="rollNumber" value={formData.rollNumber} onChange={handleChange} placeholder="e.g. CMR2024001" />
-                                <Input label="Institute" name="institute" value={formData.institute} onChange={handleChange} placeholder="Your institution" />
+                                <Input label="Email ID" name="email" value={user.email} disabled />
                             </div>
                         </Card>
 
@@ -175,10 +181,6 @@ const Profile = () => {
                             </div>
                         </Card>
 
-                        <Card style={{ padding: '2rem', marginBottom: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-main)' }}>Profile Picture URL</h3>
-                            <Input label="Profile Image URL" name="profileImage" value={formData.profileImage} onChange={handleChange} placeholder="https://your-image-url.com/photo.jpg" />
-                        </Card>
 
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <Button type="submit" disabled={loading}>

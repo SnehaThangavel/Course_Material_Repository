@@ -90,7 +90,7 @@ const Dashboard = () => {
                         <h3 className="section-title" style={{ margin: 0 }}>Strategic Operations</h3>
                     </div>
 
-                    <div className="grid-2" style={{ gap: '1.5rem' }}>
+                    <div className="grid-1" style={{ gap: '1.5rem' }}>
                         <Link to="/admin/add-course" style={{ textDecoration: 'none' }}>
                             <Card style={{ padding: '2.5rem', display: 'flex', gap: '2rem', alignItems: 'center', transition: 'all 0.4s' }} className="hover:translate-x-1 hover:border-primary-light">
                                 <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(79, 70, 229, 0.2)' }}>
@@ -102,17 +102,7 @@ const Dashboard = () => {
                                 </div>
                             </Card>
                         </Link>
-                        <Link to="/admin/courses" style={{ textDecoration: 'none' }}>
-                            <Card style={{ padding: '2.5rem', display: 'flex', gap: '2rem', alignItems: 'center', transition: 'all 0.4s' }} className="hover:translate-x-1 hover:border-accent-light">
-                                <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(139, 92, 246, 0.2)' }}>
-                                    <FileText size={32} />
-                                </div>
-                                <div>
-                                    <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Library Auditor</h3>
-                                    <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.5, margin: 0 }}>Review and synchronize your global material repository.</p>
-                                </div>
-                            </Card>
-                        </Link>
+
                     </div>
                 </div>
 

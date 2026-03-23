@@ -6,7 +6,7 @@ import AdminLayout from '../../layout/AdminLayout';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import { ChevronLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, BookOpen, Link as LinkIcon } from 'lucide-react';
+import { ChevronLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, BookOpen, Link as LinkIcon, Edit2 } from 'lucide-react';
 
 const SKILL_CATS = ['Software', 'Hardware', 'General'];
 
@@ -225,13 +225,28 @@ const AddCourse = () => {
                                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0 }}>
                                     {level.levelNumber}
                                 </div>
-                                <input
-                                    value={level.levelTitle}
-                                    onChange={(e) => { e.stopPropagation(); updateLevel(lIdx, 'levelTitle', e.target.value); }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-main)', fontWeight: 700, fontSize: '0.95rem', outline: 'none' }}
-                                    placeholder="Level title (e.g. Programming Java Level - 1)"
-                                />
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        value={level.levelTitle}
+                                        onChange={(e) => { e.stopPropagation(); updateLevel(lIdx, 'levelTitle', e.target.value); }}
+                                        onClick={(e) => e.stopPropagation()}
+                                        style={{ 
+                                            flex: 1, 
+                                            border: '1px solid transparent', 
+                                            padding: '4px 8px', 
+                                            borderRadius: '4px',
+                                            background: 'transparent', 
+                                            color: 'var(--text-main)', 
+                                            fontWeight: 700, 
+                                            fontSize: '0.95rem', 
+                                            outline: 'none',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        className="level-title-input"
+                                        placeholder="Level title (e.g. Programming Java Level - 1)"
+                                    />
+                                    <Edit2 size={14} style={{ color: 'var(--text-light)', opacity: 0.6 }} />
+                                </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{(level.topics || []).length} topics</span>
                                     <button onClick={(e) => { e.stopPropagation(); removeLevel(lIdx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '0.25rem' }}>
@@ -261,13 +276,51 @@ const AddCourse = () => {
 
                                             {/* Materials */}
                                             {(topic.materials || []).map((mat, mIdx) => (
-                                                <div key={mIdx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 2fr auto', gap: '0.5rem', marginBottom: '0.5rem', paddingLeft: '2rem' }}>
-                                                    <input value={mat.title} onChange={(e) => updateMaterial(lIdx, tIdx, mIdx, 'title', e.target.value)} style={inputStyle} placeholder="Material title" />
-                                                    <select value={mat.type} onChange={(e) => updateMaterial(lIdx, tIdx, mIdx, 'type', e.target.value)} style={inputStyle}>
+                                                <div key={mIdx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 2fr auto auto', gap: '0.5rem', marginBottom: '0.5rem', paddingLeft: '2rem', alignItems: 'center' }}>
+                                                    <input value={mat.title} onChange={(e) => updateMaterial(lIdx, tIdx, mIdx, 'title', e.target.value)} style={inputStyle} placeholder="Material title" title="Material Title" />
+                                                    <select value={mat.type} onChange={(e) => updateMaterial(lIdx, tIdx, mIdx, 'type', e.target.value)} style={inputStyle} title="Material Type">
                                                         {['link', 'pdf', 'youtube', 'document', 'image', 'zip'].map(t => <option key={t} value={t}>{t}</option>)}
                                                     </select>
-                                                    <input value={mat.url} onChange={(e) => updateMaterial(lIdx, tIdx, mIdx, 'url', e.target.value)} style={inputStyle} placeholder="URL" />
-                                                    <button onClick={() => removeMaterial(lIdx, tIdx, mIdx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }}>
+                                                    <input value={mat.url} onChange={(e) => updateMaterial(lIdx, tIdx, mIdx, 'url', e.target.value)} style={inputStyle} placeholder="URL or File Path" title="Material URL/Path" />
+                                                    
+                                                    {/* Upload Button for specific types */}
+                                                    {['pdf', 'document', 'image', 'zip'].includes(mat.type) && (
+                                                        <div style={{ position: 'relative' }}>
+                                                            <button 
+                                                                type="button"
+                                                                className="btn-secondary" 
+                                                                style={{ padding: '0.4rem 0.6rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                                                onClick={() => document.getElementById(`file-upload-${lIdx}-${tIdx}-${mIdx}`).click()}
+                                                            >
+                                                                <Plus size={12} /> Upload
+                                                            </button>
+                                                            <input 
+                                                                id={`file-upload-${lIdx}-${tIdx}-${mIdx}`}
+                                                                type="file" 
+                                                                style={{ display: 'none' }} 
+                                                                onChange={async (e) => {
+                                                                    if (e.target.files && e.target.files[0]) {
+                                                                        const file = e.target.files[0];
+                                                                        const formData = new FormData();
+                                                                        formData.append('file', file);
+                                                                        try {
+                                                                            toast.info('Uploading file...');
+                                                                            const res = await axios.post('/api/upload', formData, {
+                                                                                headers: { 'Content-Type': 'multipart/form-data' }
+                                                                            });
+                                                                            updateMaterial(lIdx, tIdx, mIdx, 'url', res.data.url);
+                                                                            if (!mat.title) updateMaterial(lIdx, tIdx, mIdx, 'title', file.name);
+                                                                            toast.success('File uploaded successfully');
+                                                                        } catch (err) {
+                                                                            toast.error(err.response?.data?.message || 'Upload failed');
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
+
+                                                    <button onClick={() => removeMaterial(lIdx, tIdx, mIdx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }} title="Remove Material">
                                                         <Trash2 size={14} />
                                                     </button>
                                                 </div>

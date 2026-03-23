@@ -26,39 +26,14 @@ mongoose.connect(mongoURI).then(async () => {
     // Create Admin
     const admin = await User.create({
         name: 'Principal Administrator',
-        email: 'admin@cmr.com',
+        email: 'admin@bitsathy.ac.in',
         password: adminPassword,
         role: 'admin',
-        institute: 'CMR University',
+        institute: 'Bannari Amman Institute of Technology',
         department: 'Administration',
     });
 
-    // Create Students
-    const student = await User.create({
-        name: 'Sneha Reddy',
-        email: 'student@cmr.com',
-        password: studentPassword,
-        role: 'student',
-        institute: 'CMR University',
-        rollNumber: 'CMR2024001',
-        department: 'Computer Science',
-        year: '2',
-        stream: 'BTECH',
-    });
-
-    const student1 = await User.create({
-        name: 'Rahul Kumar',
-        email: 'student1@cmr.com',
-        password: studentPassword,
-        role: 'student',
-        institute: 'CMR University',
-        rollNumber: 'CMR2024002',
-        department: 'Information Technology',
-        year: '3',
-        stream: 'BE',
-    });
-
-    console.log('Created Users: admin@cmr.com, student@cmr.com & student1@cmr.com');
+    console.log('Created Users: admin@bitsathy.ac.in');
 
     // ─────────────────────────────────────────────
     // 5 Programming Courses with Level Structures
@@ -323,7 +298,7 @@ mongoose.connect(mongoURI).then(async () => {
             title: 'Aptitude',
             courseCode: 'APT-101',
             category: 'General',
-            skillCategory: 'General Skills',
+            skillCategory: 'General',
             level: 'Beginner',
             description: 'Comprehensive aptitude training covering quantitative, logical, and verbal reasoning.',
             coverImage: 'https://images.unsplash.com/photo-1596495578065-6e0763fa1178?w=800&q=80',
@@ -447,7 +422,7 @@ mongoose.connect(mongoURI).then(async () => {
             title: 'Communication',
             courseCode: 'COMM-101',
             category: 'General',
-            skillCategory: 'General Skills',
+            skillCategory: 'General',
             level: 'Beginner',
             description: 'Essential communication skills including reading, listening, and email etiquette.',
             coverImage: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80',
@@ -530,38 +505,18 @@ mongoose.connect(mongoURI).then(async () => {
 
     console.log(`Created ${courses.length} programming courses.`);
 
-    // Enroll students with level-based enrollments
-    const javaIdx = 1; // Java Programming
-    const pythonIdx = 2; // Python Programming
-    const cIdx = 0; // C Programming
-
-    const enrollmentData = [
-        // student enrolled in Java Level 1
-        { studentId: student._id, courseId: courses[javaIdx]._id, levelNumber: 1, progress: 0, completed: false },
-        // student enrolled in Python Level 1
-        { studentId: student._id, courseId: courses[pythonIdx]._id, levelNumber: 1, progress: 0, completed: false },
-        // student1 enrolled in C Programming Level 1
-        { studentId: student1._id, courseId: courses[cIdx]._id, levelNumber: 1, progress: 0, completed: false },
-        // student1 enrolled in Java Level 1
-        { studentId: student1._id, courseId: courses[javaIdx]._id, levelNumber: 1, progress: 0, completed: false },
-    ];
+    // Enroll students with level-based enrollments (None by default)
+    const enrollmentData = [];
     await Enrollment.insertMany(enrollmentData);
 
-    // Create UserProgress records for completed levels
-    const progressData = [
-        { userId: student._id, courseId: courses[javaIdx]._id, levelNumber: 1, completed: false },
-        { userId: student._id, courseId: courses[pythonIdx]._id, levelNumber: 1, completed: false },
-        { userId: student1._id, courseId: courses[cIdx]._id, levelNumber: 1, completed: false },
-        { userId: student1._id, courseId: courses[javaIdx]._id, levelNumber: 1, completed: false },
-    ];
+    // Create UserProgress records for completed levels (None by default)
+    const progressData = [];
     await UserProgress.insertMany(progressData);
 
     console.log('Created enrollments and user progress records.');
     console.log('\n✅ Seeding complete!');
     console.log('Credentials:');
-    console.log('  Admin:    admin@cmr.com    / Admin@123');
-    console.log('  Student:  student@cmr.com  / Student@123');
-    console.log('  Student1: student1@cmr.com / Student@123');
+    console.log('  Admin:    admin@bitsathy.ac.in    / Admin@123');
     process.exit(0);
 }).catch(err => {
     console.error(err);

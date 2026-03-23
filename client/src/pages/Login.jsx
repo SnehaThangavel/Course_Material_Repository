@@ -79,7 +79,7 @@ const Login = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                placeholder="name@protocol.com"
+                                placeholder="Enter your email"
                                 style={{ width: '100%', height: '44px', paddingLeft: '2.75rem', paddingRight: '1rem', borderRadius: '12px', border: '1.5px solid var(--border)', background: 'var(--bg)', fontSize: '0.9rem', fontWeight: 600, transition: 'all 0.2s', boxSizing: 'border-box' }}
                                 className="focus:border-primary focus:bg-white focus:shadow-lg outline-none"
                             />
@@ -100,7 +100,7 @@ const Login = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                placeholder="••••••••"
+                                placeholder="Enter Password"
                                 style={{ width: '100%', height: '44px', paddingLeft: '2.75rem', paddingRight: '1rem', borderRadius: '12px', border: '1.5px solid var(--border)', background: 'var(--bg)', fontSize: '0.9rem', fontWeight: 600, transition: 'all 0.2s', boxSizing: 'border-box' }}
                                 className="focus:border-primary focus:bg-white focus:shadow-lg outline-none"
                             />

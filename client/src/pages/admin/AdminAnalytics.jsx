@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import AdminLayout from '../../layout/AdminLayout';
 import Card from '../../components/Card';
@@ -48,10 +49,10 @@ const AdminAnalytics = () => {
     if (loading) return <AdminLayout><Loader /></AdminLayout>;
 
     const statCards = [
-        { label: 'Total Students', value: overview?.totalStudents || 0, icon: <Users size={22} />, color: '#6366f1' },
-        { label: 'Published Courses', value: overview?.totalCourses || 0, icon: <BookOpen size={22} />, color: '#8b5cf6' },
-        { label: 'Total Enrollments', value: overview?.totalEnrollments || 0, icon: <TrendingUp size={22} />, color: '#06b6d4' },
-        { label: 'Completion Rate', value: `${overview?.completionRate || 0}%`, icon: <CheckCircle size={22} />, color: '#10b981' },
+        { label: 'Total Students', value: overview?.totalStudents || 0, icon: <Users size={22} />, color: '#6366f1', link: '/admin/students-list' },
+        { label: 'Published Courses', value: overview?.totalCourses || 0, icon: <BookOpen size={22} />, color: '#8b5cf6', link: '/admin/published-courses' },
+        { label: 'Total Enrollments', value: overview?.totalEnrollments || 0, icon: <TrendingUp size={22} />, color: '#06b6d4', link: '/admin/enrollment-details' },
+        { label: 'Completed Courses', value: overview?.completedCount || 0, icon: <CheckCircle size={22} />, color: '#10b981', link: '/admin/completed-details' },
     ];
 
     return (
@@ -65,15 +66,17 @@ const AdminAnalytics = () => {
                 {/* Stat Cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
                     {statCards.map((s, i) => (
-                        <Card key={i} style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ padding: '0.75rem', borderRadius: '12px', background: `${s.color}20`, color: s.color }}>
-                                {s.icon}
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1 }}>{s.value}</div>
-                                <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>{s.label}</div>
-                            </div>
-                        </Card>
+                        <Link to={s.link} key={i} style={{ textDecoration: 'none' }}>
+                            <Card style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', height: '100%', transition: 'transform 0.2s', cursor: 'pointer' }} className="hover:scale-105">
+                                <div style={{ padding: '0.75rem', borderRadius: '12px', background: `${s.color}20`, color: s.color }}>
+                                    {s.icon}
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1 }}>{s.value}</div>
+                                    <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>{s.label}</div>
+                                </div>
+                            </Card>
+                        </Link>
                     ))}
                 </div>
 

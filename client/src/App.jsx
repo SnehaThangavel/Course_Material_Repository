@@ -12,7 +12,10 @@ import AddCourse from './pages/admin/AddCourse';
 import AdminProfile from './pages/admin/AdminProfile';
 import Feedbacks from './pages/admin/Feedbacks';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
-
+import AdminStudentsList from './pages/admin/AdminStudentsList';
+import AdminPublishedCourses from './pages/admin/AdminPublishedCourses';
+import AdminEnrollmentDetails from './pages/admin/AdminEnrollmentDetails';
+import AdminCompletedDetails from './pages/admin/AdminCompletedDetails';
 import StudentDashboard from './pages/student/Dashboard';
 import CourseDiscovery from './pages/student/CourseDiscovery';
 import MyCourses from './pages/student/MyCourses';
@@ -48,6 +51,12 @@ function App() {
           <Route path="/admin/feedbacks" element={<ProtectedRoute role="admin"><Feedbacks /></ProtectedRoute>} />
           <Route path="/admin/profile" element={<ProtectedRoute role="admin"><AdminProfile /></ProtectedRoute>} />
           <Route path="/admin/analytics" element={<ProtectedRoute role="admin"><AdminAnalytics /></ProtectedRoute>} />
+          
+          {/* New Admin Detail Routes */}
+          <Route path="/admin/students-list" element={<ProtectedRoute role="admin"><AdminStudentsList /></ProtectedRoute>} />
+          <Route path="/admin/published-courses" element={<ProtectedRoute role="admin"><AdminPublishedCourses /></ProtectedRoute>} />
+          <Route path="/admin/enrollment-details" element={<ProtectedRoute role="admin"><AdminEnrollmentDetails /></ProtectedRoute>} />
+          <Route path="/admin/completed-details" element={<ProtectedRoute role="admin"><AdminCompletedDetails /></ProtectedRoute>} />
 
           <Route path="/student" element={<ProtectedRoute role="student"><StudentDashboard /></ProtectedRoute>} />
           <Route path="/student/discovery" element={<ProtectedRoute role="student"><CourseDiscovery /></ProtectedRoute>} />

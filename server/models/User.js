@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   year: { type: String, default: '' },
   stream: { type: String, enum: ['BE', 'BTECH', 'MCA', 'MBA', 'Other', ''], default: '' },
   phone: { type: String, default: '' },
+  lastNotificationCheck: { type: Date, default: Date.now },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

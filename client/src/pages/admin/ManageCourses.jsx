@@ -28,33 +28,32 @@ const ManageCourses = () => {
 
     const fetchCourses = () => {
         setLoading(true);
-        axios.get(`/api/courses?search=${searchTerm}`)
-            .then(res => setCourses(res.data))
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('search', searchTerm);
+        if (levelFilter !== 'all') params.append('level', levelFilter);
+        if (categoryFilter !== 'All') params.append('category', categoryFilter);
+        
+        // Handle status filter separately as it's not currently in the backend getCourses for admins
+        // But we can still use it for client-side filtering if backend doesn't support it yet
+        // OR we can update backend. For now, let's keep search/level/cat on server.
+
+        axios.get(`/api/courses?${params.toString()}`)
+            .then(res => {
+                let data = res.data;
+                // Still apply status filter on client as backend getCourses for admins doesn't filter by status
+                if (statusFilter === 'draft') data = data.filter(c => !c.isPublished);
+                if (statusFilter === 'published') data = data.filter(c => c.isPublished);
+                setCourses(data);
+            })
             .catch(err => toast.error('Failed to fetch courses'))
             .finally(() => setLoading(false));
     };
 
     useEffect(() => {
         fetchCourses();
-    }, [searchTerm]);
+    }, [searchTerm, statusFilter, levelFilter, categoryFilter]);
 
-    const filteredCourses = courses.filter(course => {
-        let matchesStatus = true;
-        if (statusFilter === 'draft') matchesStatus = !course.isPublished;
-        if (statusFilter === 'published') matchesStatus = course.isPublished;
-
-        let matchesLevel = true;
-        if (levelFilter !== 'all') {
-            matchesLevel = course.level === levelFilter;
-        }
-
-        let matchesCategory = true;
-        if (categoryFilter !== 'All') {
-            matchesCategory = course.category === categoryFilter;
-        }
-
-        return matchesStatus && matchesLevel && matchesCategory;
-    });
+    const filteredCourses = courses; // Already filtered by status in fetchCourses
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this course?')) {
@@ -82,20 +81,15 @@ const ManageCourses = () => {
                 </div>
 
                 <div style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', marginBottom: '2.5rem' }}>
-                    <div style={{ display: 'flex', gap: '1.25rem', marginBottom: '1.5rem' }}>
-                        <div className="input-with-icon" style={{ flex: 1 }}>
-                            <div className="input-icon"><Search size={18} /></div>
-                            <input
-                                type="text"
-                                placeholder="Search by title, code, or description..."
-                                className="input-field has-icon"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                        <button className="btn-secondary">
-                            <Filter size={18} /> Advanced Filters
-                        </button>
+                    <div className="input-with-icon" style={{ marginBottom: '1.5rem' }}>
+                        <div className="input-icon"><Search size={18} /></div>
+                        <input
+                            type="text"
+                            placeholder="Search by title, code, or description..."
+                            className="input-field has-icon"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
 
                     <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -158,8 +152,6 @@ const ManageCourses = () => {
                                     </div>
                                     <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{course.title}</h3>
                                     <div style={{ display: 'flex', gap: '1.25rem', color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 500, flexWrap: 'wrap' }}>
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}><FileText size={14} /> {course.sections?.reduce((acc, sec) => acc + sec.materials.length, 0)} Materials</span>
-                                        <span>•</span>
                                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                             <Layers size={14} />
                                             <strong style={{ color: 'var(--primary)' }}>{course.levels?.length || course.totalLevels || 0}</strong>&nbsp;Levels

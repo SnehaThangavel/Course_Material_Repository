@@ -267,7 +267,14 @@ const CourseDetails = () => {
                                             }}>
                                             {/* Level Header */}
                                             <div
-                                                onClick={() => setExpandedLevel(isExpanded ? null : idx)}
+                                                onClick={() => {
+                                                    const isAptitude = course.title.toLowerCase().includes('aptitude');
+                                                    if (!isRegistered && !isAptitude) {
+                                                        toast.info('Please register for this level to view topics and materials.');
+                                                        return;
+                                                    }
+                                                    setExpandedLevel(isExpanded ? null : idx);
+                                                }}
                                                 style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.25rem 1.5rem', cursor: 'pointer', background: isRegistered ? 'linear-gradient(135deg, #f0f4ff, #fff)' : 'var(--surface)' }}>
 
                                                 {/* Level number badge */}
@@ -309,7 +316,8 @@ const CourseDetails = () => {
                                                         // Check for Level N-1 completion if lvl.levelNumber > 1
                                                         const isFirstLevel = lvl.levelNumber === 1;
                                                         const prevLvlEnroll = !isFirstLevel ? getLevelEnrollment(lvl.levelNumber - 1) : null;
-                                                        const isPrerequisiteMet = isFirstLevel || !!prevLvlEnroll?.completed;
+                                                        const isAptitude = course.title.toLowerCase().includes('aptitude');
+                                                        const isPrerequisiteMet = isFirstLevel || isAptitude || !!prevLvlEnroll?.completed;
 
                                                         if (!isPrerequisiteMet) {
                                                             return (
