@@ -114,7 +114,7 @@ const StudentAnalytics = () => {
     const courseCompletionPercentage = data?.totalEnrolled > 0 ? Math.round((completedCourses / data.totalEnrolled) * 100) : 0;
 
     const stats = [
-        { label: 'Ongoing Courses', value: data?.activeCount || 0, icon: <BookOpen size={22} />, color: '#6366f1', link: '/student/courses' },
+        { label: 'Ongoing Courses', value: data?.totalEnrolled || 0, icon: <BookOpen size={22} />, color: '#6366f1', link: '/student/courses' },
         { label: 'Levels Completed', value: data?.completedCount || 0, icon: <CheckCircle size={22} />, color: '#10b981', link: '/student/courses?filter=completed' },
     ];
 

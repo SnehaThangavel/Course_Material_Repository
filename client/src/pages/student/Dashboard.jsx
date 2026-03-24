@@ -12,6 +12,8 @@ const StudentDashboard = () => {
     const { user } = useContext(AuthContext);
     const [enrollments, setEnrollments] = useState([]);
     const [totalCourses, setTotalCourses] = useState(0);
+    const [registeredCount, setRegisteredCount] = useState(0);
+    const [completedCount, setCompletedCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [recentCourses, setRecentCourses] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -31,14 +33,20 @@ const StudentDashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [enrollRes, courseRes] = await Promise.all([
+                const [enrollRes, courseRes, analyticsRes] = await Promise.all([
                     axios.get('/api/mycourses'),
-                    axios.get('/api/courses')
+                    axios.get('/api/courses'),
+                    axios.get('/api/analytics/student-overview')
                 ]);
 
                 const allCourses = courseRes.data || [];
                 setEnrollments(enrollRes.data || []);
                 setTotalCourses(allCourses.length);
+
+                // Use analytics API for accurate deduplicated counts
+                const analyticsData = analyticsRes.data;
+                setRegisteredCount(analyticsData.totalEnrolled || 0);
+                setCompletedCount(analyticsData.completedCount || 0);
 
                 // Show all courses to match admin visibility (up to 7+)
                 setRecentCourses(allCourses.slice(0, 10));
@@ -114,7 +122,7 @@ const StudentDashboard = () => {
                                 <Bookmark size={24} />
                             </div>
                             <div>
-                                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1, marginBottom: '0.25rem' }}>{activeEnrollments.length}</div>
+                                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1, marginBottom: '0.25rem' }}>{registeredCount}</div>
                                 <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: 600 }}>Registered Courses</div>
                             </div>
                         </Card>
@@ -126,7 +134,7 @@ const StudentDashboard = () => {
                                 <CheckCircle size={24} />
                             </div>
                             <div>
-                                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1, marginBottom: '0.25rem' }}>{completedEnrollments.length}</div>
+                                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1, marginBottom: '0.25rem' }}>{completedCount}</div>
                                 <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: 600 }}>Completed</div>
                             </div>
                         </Card>
