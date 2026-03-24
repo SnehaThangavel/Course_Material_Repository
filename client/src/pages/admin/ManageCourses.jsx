@@ -159,7 +159,7 @@ const ManageCourses = () => {
                                         <span>•</span>
                                         <span>{course.level}</span>
                                         <span>•</span>
-                                        <span>{course.category}</span>
+                                        <span>{course.skillCategory}</span>
                                     </div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.75rem' }}>
