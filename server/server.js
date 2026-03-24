@@ -20,8 +20,15 @@ app.use('/api', require('./routes/enrollment.routes'));
 app.use('/api/analytics', require('./routes/analytics.routes'));
 app.use('/api/upload', require('./routes/upload.routes'));
 
-// Static files
+// Static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve Frontend in Production
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
