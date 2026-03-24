@@ -167,11 +167,10 @@ const CourseDetails = () => {
                         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                             <div style={{ flex: '1 1 380px', padding: '2.5rem' }}>
                                 <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
-                                    <span className="badge badge-primary">{course.category}</span>
-                                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', border: '1px solid var(--border)', padding: '0.2rem 0.7rem', borderRadius: '100px' }}>{course.level}</span>
                                     {course.skillCategory && (
-                                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', border: '1px solid var(--primary-light)', padding: '0.2rem 0.7rem', borderRadius: '100px' }}>{course.skillCategory}</span>
+                                        <span className="badge badge-primary">{course.skillCategory}</span>
                                     )}
+                                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', border: '1px solid var(--border)', padding: '0.2rem 0.7rem', borderRadius: '100px' }}>{course.level}</span>
                                 </div>
                                 <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1.1 }}>{course.title}</h1>
                                 <p style={{ fontSize: '1rem', color: 'var(--text-muted)', marginBottom: '2rem', lineHeight: 1.7 }}>{course.description}</p>

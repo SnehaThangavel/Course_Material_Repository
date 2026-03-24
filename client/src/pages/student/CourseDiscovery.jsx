@@ -92,7 +92,7 @@ const CourseDiscovery = () => {
                                     </div>
                                 </div>
                                 <div style={{ padding: '2rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>{course.category}</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>{course.skillCategory}</div>
                                     <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{course.title}</h3>
                                     <p style={{ fontSize: '0.925rem', color: 'var(--text-muted)', marginBottom: '2rem', flex: 1, lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{course.description}</p>
 
