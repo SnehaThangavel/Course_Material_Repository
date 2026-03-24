@@ -226,6 +226,37 @@ exports.getStudentOverview = async (req, res) => {
             progress: data.progress
         }));
 
+        // Deduplicate and map for tableData
+        const tableMap = new Map();
+        enrollments.forEach(e => {
+            if (!e.courseId) return;
+            const key = e.courseId._id.toString();
+            if (!tableMap.has(key)) {
+                tableMap.set(key, []);
+            }
+            tableMap.get(key).push(e);
+        });
+
+        const deduplicatedData = [];
+        tableMap.forEach(courseEnrollments => {
+            const hasLevels = courseEnrollments.some(e => e.levelNumber > 0);
+            if (hasLevels) {
+                deduplicatedData.push(...courseEnrollments.filter(e => e.levelNumber > 0));
+            } else {
+                deduplicatedData.push(...courseEnrollments);
+            }
+        });
+
+        const tableData = deduplicatedData.map(e => ({
+            _id: e._id,
+            courseTitle: e.courseId.title,
+            skillCategory: e.courseId.skillCategory,
+            level: e.levelNumber === 0 ? 'Full Course' : `Level ${e.levelNumber}`,
+            status: e.completed ? 'Completed' : 'In Progress',
+            progress: e.progress || 0,
+            completionDate: e.completionDate
+        }));
+
         res.json({
             totalEnrolled: totalEnrolledCourses,
             activeCount: activeCount,
@@ -233,6 +264,7 @@ exports.getStudentOverview = async (req, res) => {
             skillData,
             growthData,
             courseProgress,
+            tableData,
             totalSystemSkills,
             studentSkillCount,
             completedSkillCount

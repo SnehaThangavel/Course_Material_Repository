@@ -198,7 +198,7 @@ const AdminProfile = () => {
                                     {/* Admin ID + Department */}
                                     <div className="grid-2" style={{ gap: '1.5rem' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                                            <label style={labelStyle}>Admin ID / Employee ID</label>
+                                            <label style={labelStyle}>Admin ID</label>
                                             <Input name="rollNumber" value={formData.rollNumber} onChange={handleChange} placeholder="e.g. CMR-ADM-001" />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>

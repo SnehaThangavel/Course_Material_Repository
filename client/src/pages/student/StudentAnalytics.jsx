@@ -3,11 +3,7 @@ import axios from 'axios';
 import StudentLayout from '../../layout/StudentLayout';
 import Card from '../../components/Card';
 import Loader from '../../components/Loader';
-import {
-    PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
-    AreaChart, Area,
-} from 'recharts';
+
 import { TrendingUp, CheckCircle, BookOpen, Award, Download, User as UserIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -118,7 +114,7 @@ const StudentAnalytics = () => {
     const courseCompletionPercentage = data?.totalEnrolled > 0 ? Math.round((completedCourses / data.totalEnrolled) * 100) : 0;
 
     const stats = [
-        { label: 'Registered Courses', value: data?.totalEnrolled || 0, icon: <BookOpen size={22} />, color: '#6366f1', link: '/student/courses' },
+        { label: 'Ongoing Courses', value: data?.activeCount || 0, icon: <BookOpen size={22} />, color: '#6366f1', link: '/student/courses' },
         { label: 'Levels Completed', value: data?.completedCount || 0, icon: <CheckCircle size={22} />, color: '#10b981', link: '/student/courses?filter=completed' },
     ];
 
@@ -208,8 +204,61 @@ const StudentAnalytics = () => {
                     ))}
                 </div>
 
-                {/* Overall Performance */}
+                {/* Course Completion Table */}
                 <Card style={{ padding: '0', overflow: 'hidden', marginBottom: '2.5rem' }}>
+                    <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Course Completion Details</h3>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                            {data?.tableData?.length || 0} records found
+                        </div>
+                    </div>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead>
+                                <tr style={{ background: '#f8fafc', borderBottom: '2px solid var(--border)' }}>
+                                    {['Course Details', 'Level', 'Progress', 'Status'].map(h => (
+                                        <th key={h} style={{ padding: '1rem', fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(!data?.tableData || data.tableData.length === 0) ? (
+                                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)', fontWeight: 600 }}>No course data available.</td></tr>
+                                ) : data.tableData.map((row, i) => (
+                                    <tr key={i} style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.2s' }} className="hover:bg-slate-50">
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{row.courseTitle}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>{row.skillCategory}</div>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <span style={{ padding: '0.2rem 0.6rem', borderRadius: '6px', background: '#f1f5f9', fontSize: '0.75rem', fontWeight: 800, color: '#475569' }}>
+                                                {row.level}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ width: '100px', height: '6px', background: '#e2e8f0', borderRadius: '10px', overflow: 'hidden', marginBottom: '0.4rem' }}>
+                                                <div style={{ width: `${row.progress}%`, height: '100%', background: row.progress === 100 ? '#10b981' : 'var(--primary)', borderRadius: '10px' }}></div>
+                                            </div>
+                                            <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-main)' }}>{row.progress}%</div>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <span style={{
+                                                padding: '0.25rem 0.6rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800,
+                                                background: row.status === 'Completed' ? '#d1fae5' : '#fef3c7',
+                                                color: row.status === 'Completed' ? '#059669' : '#d97706'
+                                            }}>
+                                                {row.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
+
+                {/* Overall Performance */}
+                <Card style={{ padding: '0', overflow: 'hidden', marginBottom: '1.5rem' }}>
                     <div style={{ padding: '2rem 2.5rem', borderBottom: '1px solid var(--border)', background: 'var(--surface-muted)' }}>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                             <TrendingUp size={22} style={{ color: 'var(--primary)' }} />
@@ -246,104 +295,6 @@ const StudentAnalytics = () => {
                         </div>
                     </div>
                 </Card>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                    {/* Skill Distribution Pie */}
-                    <Card style={{ padding: '2.5rem' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '2rem', color: 'var(--text-main)' }}>Skill Distribution</h3>
-                        {data?.skillData && data.skillData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height={280}>
-                                <PieChart>
-                                    <Pie
-                                        data={data.skillData}
-                                        cx="50%" cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={90}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                    >
-                                        {data.skillData.map((_, idx) => <Cell key={idx} fill={COLORS[idx % COLORS.length]} />)}
-                                    </Pie>
-                                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-lg)' }} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        ) : <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>Engagement data pending.</p>}
-                    </Card>
-
-                    {/* Growth Line Chart */}
-                    <Card style={{ padding: '2.5rem' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '2rem', color: 'var(--text-main)' }}>Learning Trajectory</h3>
-                        {data?.growthData && data.growthData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height={280}>
-                                <AreaChart 
-                                    data={data.growthData} 
-                                    margin={{ top: 20, right: 30, left: 10, bottom: 10 }}
-                                >
-                                    <defs>
-                                        <linearGradient id="colorLevels" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0.0}/>
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} opacity={0.5} />
-                                    <XAxis 
-                                        dataKey="date" 
-                                        tick={{ fontSize: 10, fontWeight: 700, fill: 'var(--text-muted)' }} 
-                                        axisLine={false} 
-                                        tickLine={false}
-                                        dy={15}
-                                        padding={{ left: 20, right: 20 }}
-                                    />
-                                    <YAxis 
-                                        tick={{ fontSize: 10, fontWeight: 700, fill: 'var(--text-muted)' }} 
-                                        axisLine={false} 
-                                        tickLine={false}
-                                        allowDecimals={false}
-                                        dx={-10}
-                                        label={{ 
-                                            value: 'LEVELS COMPLETED', 
-                                            angle: -90, 
-                                            position: 'insideLeft', 
-                                            offset: 0, 
-                                            style: { fontSize: '9px', fontWeight: 900, fill: 'var(--text-light)', letterSpacing: '0.1em' } 
-                                        }}
-                                    />
-                                    <Tooltip 
-                                        contentStyle={{ 
-                                            borderRadius: '16px', 
-                                            border: '1px solid var(--border)', 
-                                            boxShadow: 'var(--shadow-lg)',
-                                            padding: '12px 16px',
-                                            background: 'rgba(255, 255, 255, 0.95)',
-                                            backdropFilter: 'blur(4px)'
-                                        }} 
-                                        itemStyle={{ fontWeight: 800, color: 'var(--primary)', fontSize: '14px' }}
-                                        labelStyle={{ fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase' }}
-                                        cursor={{ stroke: 'var(--primary)', strokeWidth: 2, strokeDasharray: '6 6', opacity: 0.3 }}
-                                    />
-                                    <Area 
-                                        type="monotone" 
-                                        dataKey="levels" 
-                                        stroke="var(--primary)" 
-                                        strokeWidth={4} 
-                                        fillOpacity={1} 
-                                        fill="url(#colorLevels)"
-                                        dot={{ r: 5, fill: 'var(--primary)', stroke: '#fff', strokeWidth: 2 }}
-                                        activeDot={{ r: 7, fill: 'var(--primary)', stroke: '#fff', strokeWidth: 2 }}
-                                        animationDuration={1500}
-                                        animationEasing="ease-in-out"
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-                                <TrendingUp size={48} style={{ opacity: 0.3, marginBottom: '1.5rem' }} />
-                                <p style={{ fontWeight: 600 }}>Milestones will appear here as you complete levels.</p>
-                            </div>
-                        )}
-                    </Card>
-                </div>
                 </div>
             </div>
         </StudentLayout>
